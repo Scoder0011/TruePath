@@ -7,23 +7,23 @@ This document explains how the project pieces connect, and how we work together 
 ## 1. How Everything Connects
 
 ```
-┌─────────────────┐        HTTPS/JSON         ┌──────────────────┐
-│    frontend/     │ ────────────────────────▶ │     backend/      │
-│  Next.js (Vercel)│ ◀──────────────────────── │ Express (Render)  │
-└─────────────────┘        API responses        └──────────────────┘
+┌─────────────────┐        HTTPS/JSON          ┌─────────────────┐
+│    frontend/     │ ────────────────────────▶ │     backend/    │
+│  Next.js (Vercel)│ ◀──────────────────────── │ Express (Render)│
+└─────────────────┘        API responses       └───────────────-─┘
         │                                                │
         │ imports types/validators from                  │ imports types/validators from
         ▼                                                ▼
               ┌────────────────────────────┐
-              │          shared/            │
-              │  types/  +  validators/     │
+              │          shared/           │
+              │  types/  +  validators/    │
               └────────────────────────────┘
                                                           │
                                                           │ reads/writes
                                                           ▼
                                                 ┌──────────────────┐
-                                                │     database/      │
-                                                │  Supabase(Postgres) │
+                                                │     database/    │
+                                                │  Supabase(Postgres)│
                                                 └──────────────────┘
 ```
 
