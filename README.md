@@ -66,3 +66,80 @@ Currently in active development as an MVP, built as a research project focused o
 ## Who This Is For
 
 Anyone figuring out where to start and how — whether you left formal education, are studying alongside it, or are pivoting into a new field entirely. There's no age or background requirement; the only thing you need is the willingness to learn on your own terms.
+
+
+## Folder Tree Structure 
+TruePath/
+├── .github/
+│   └── workflows/                    # CI checks (lint/build) before deploy — optional but good habit
+│
+├── frontend/                         # Next.js App Router → Vercel
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/page.tsx
+│   │   │   └── signup/page.tsx
+│   │   ├── (dashboard)/
+│   │   │   ├── dashboard/page.tsx    # User progress overview
+│   │   │   └── layout.tsx
+│   │   ├── paths/
+│   │   │   ├── page.tsx              # Paths directory (all top-level paths)
+│   │   │   └── [pathSlug]/
+│   │   │       ├── page.tsx          # Path overview page
+│   │   │       └── [subPathSlug]/
+│   │   │           └── page.tsx      # Sub-path page — stages/resources shown as sections here
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx                  # Landing page
+│   ├── components/
+│   │   ├── ui/                       # Low-level reusable elements (buttons, badges, modals)
+│   │   ├── auth/                     # LoginForm, UserMenu
+│   │   ├── path-tree/                # TreeView, PathNode, SubPathNode, StageSection, ResourceItem
+│   │   └── layout/                   # Navbar, Footer
+│   ├── lib/
+│   │   ├── api/client.ts             # Typed fetch wrapper calling the backend
+│   │   ├── auth/session.ts           # Client-side token/session handling
+│   │   └── hooks/                    # useProgress, useTree, etc.
+│   ├── public/
+│   │   ├── icons/
+│   │   └── images/
+│   ├── .env.example                  # NEXT_PUBLIC_API_URL=...
+│   ├── next.config.mjs
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+│
+├── backend/                          # Express API → Render
+│   ├── src/
+│   │   ├── config/                   # Env vars, Supabase client init
+│   │   ├── routes/
+│   │   │   ├── paths.route.ts        # /api/paths, /api/paths/:slug (generic — works for any path)
+│   │   │   ├── progress.route.ts     # User progress endpoints (auth required)
+│   │   │   └── auth.route.ts         # Login/signup passthrough to Supabase Auth
+│   │   ├── controllers/
+│   │   │   ├── paths.controller.ts   # Handles request/response, calls models directly
+│   │   │   ├── progress.controller.ts
+│   │   ├── models/                   # DB query functions (path, subPath, stage, resource)
+│   │   ├── middleware/
+│   │   │   ├── auth.middleware.ts    # Verifies Supabase token
+│   │   │   ├── cors.middleware.ts    # Allows only the Vercel frontend origin
+│   │   │   └── error.middleware.ts
+│   │   └── server.ts                 # Entry point
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── shared/                           # Used by both frontend and backend
+│   ├── types/
+│   │   └── paths.ts                  # Path, SubPath, Stage, Resource interfaces
+│   └── validators/
+│       └── paths.schema.ts           # Zod schemas — validates data shape before it hits the DB
+│
+├── database/                         # Schema + content, decoupled from backend code
+│   ├── migrations/
+│   │   └── 001_create_paths_schema.sql
+│   └── seeds/
+│       ├── cybersecurity.sql         # MVP content
+│       └── _template.sql             # Copy this to add any new path later
+│
+├── .gitignore
+├── package.json                      # Root workspace scripts (e.g. run both dev servers)
+└── README.md                         # Setup + "how to add a new path" instructions
