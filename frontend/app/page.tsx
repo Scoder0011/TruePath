@@ -4,7 +4,7 @@ import RoutePath from "@/components/landing/RoutePath";
 const problems = [
   {
     label: "NO STRUCTURE",
-    body: "Free, high-quality courses exist — TryHackMe, PortSwigger Academy, freeCodeCamp — but no one tells you the right order to go through them in.",
+    body: "Free, high-quality courses exist across every field — but no one tells you the order to take them in.",
   },
   {
     label: "NO MENTORSHIP",
@@ -72,15 +72,15 @@ export default function LandingPage() {
       <section className="mx-auto grid max-w-6xl gap-16 px-6 py-20 md:grid-cols-2 md:py-28">
         <div className="flex flex-col justify-center">
           <p className="font-mono text-xs tracking-[0.15em] text-amber">
-            CAREER PATH · CYBERSECURITY
+            CAREER PATHS · MAPPED
           </p>
           <h1 className="mt-4 font-display text-4xl font-bold leading-[1.1] tracking-tight md:text-5xl">
             Stop guessing where to start.
           </h1>
           <p className="mt-6 max-w-md font-body text-base leading-relaxed text-ink-soft">
-            TruePath maps out real career paths as staged roadmaps, built
-            from free and open-source resources — so you always know what to
-            learn next, and what it leads to.
+            TruePath maps out every career path after formal education as a
+            staged roadmap — free resources, the right order, and exactly what
+            it leads to.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
@@ -95,6 +95,20 @@ export default function LandingPage() {
             >
               See all paths →
             </Link>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <span className="rounded-full border border-route px-3 py-1 font-mono text-xs text-route">
+              Cybersecurity · Live
+            </span>
+            <span className="rounded-full border border-ink-line px-3 py-1 font-mono text-xs text-ink-soft">
+              Web Development · Coming soon
+            </span>
+            <span className="rounded-full border border-ink-line px-3 py-1 font-mono text-xs text-ink-soft">
+              Data Science · Coming soon
+            </span>
+            <span className="rounded-full border border-ink-line px-3 py-1 font-mono text-xs text-ink-soft">
+              Cloud &amp; DevOps · Coming soon
+            </span>
           </div>
           <p className="mt-4 font-mono text-xs text-ink-soft">
             No login required to browse.
