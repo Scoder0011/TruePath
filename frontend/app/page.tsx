@@ -1,36 +1,33 @@
 import Link from "next/link";
+import Image from "next/image";
 import RoutePath from "@/components/landing/RoutePath";
+import logo from "../logo.png";
 
 const problems = [
   {
     label: "NO STRUCTURE",
-    body: "Free, high-quality courses exist across every field — but no one tells you the order to take them in.",
+    body: "Free, high-quality courses exist — but no one tells you the right order to go through them in.",
   },
   {
     label: "NO MENTORSHIP",
-    body: "Asking in forums is hit-or-miss. Answers are inconsistent, and help is not always there when you need it.",
+    body: "Asking in forums or Discord is hit-or-miss. Answers are inconsistent, and volunteers aren't always around.",
   },
   {
     label: "NO CLEAR OUTCOME",
-    body: "Even when someone starts learning, it's unclear what job or role that learning actually leads to.",
+    body: "Even when someone starts learning, it's unclear what job or role it actually leads to.",
   },
 ];
 
-const gettingStarted = [
+const howItWorks = [
   {
     step: "01",
-    title: "Create your account",
-    body: "Free, takes 30 seconds.",
+    title: "Browse freely, no login required",
+    body: "See the full roadmap before signing up.",
   },
   {
     step: "02",
-    title: "Pick a path",
-    body: "See what's live now and what's coming.",
-  },
-  {
-    step: "03",
-    title: "Track your progress",
-    body: "Save your place, pick up where you left off.",
+    title: "Log in to track progress",
+    body: "Mark stages complete, pick up where you left off.",
   },
 ];
 
@@ -61,124 +58,132 @@ const footerLinks = [
 
 export default function LandingPage() {
   return (
-    <main>
-      <header className="border-b border-ink-line">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link href="/" className="font-display text-lg font-bold tracking-tight">
-            TruePath
-          </Link>
-          <div className="flex items-center gap-5 sm:gap-8">
-            <Link
-              href="/paths"
-              className="font-body text-sm text-ink-soft transition-colors hover:text-white"
-            >
-              Paths
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-md border border-ink-line px-4 py-2 font-body text-sm text-white transition-colors hover:border-amber hover:text-amber"
-            >
-              Log in
-            </Link>
-          </div>
-        </nav>
-      </header>
+    <main className="overflow-hidden">
+      <section className="relative isolate">
+        <div
+          aria-hidden="true"
+          className="absolute -left-28 top-10 -z-10 h-72 w-72 rounded-full bg-amber/25 blur-3xl sm:h-96 sm:w-96"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -right-24 top-20 -z-10 h-80 w-80 rounded-full bg-route/25 blur-3xl sm:h-[30rem] sm:w-[30rem]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 left-1/3 -z-10 h-48 w-48 rounded-full bg-amber/15 blur-3xl"
+        />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
-        <div className="max-w-3xl">
-          <p className="font-mono text-xs tracking-[0.15em] text-amber">
-            CAREER GUIDANCE, STRUCTURED
-          </p>
-          <h1 className="mt-4 font-display text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl">
-            Stop guessing where to start.
-          </h1>
-          <p className="mt-6 max-w-2xl font-body text-base leading-relaxed text-ink-soft md:text-lg">
-            TruePath maps out career paths as staged roadmaps — free resources,
-            the right order, and exactly what it leads to. No guesswork, no dead ends.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+          <div className="max-w-3xl rounded-2xl border border-white/10 bg-white/5 p-7 shadow-2xl shadow-ink-deep/30 backdrop-blur-xl sm:p-10 md:p-12">
+            <p className="font-mono text-xs tracking-[0.15em] text-amber">
+              CAREER GUIDANCE, STRUCTURED
+            </p>
+            <h1 className="mt-4 font-display text-4xl font-bold leading-[1.1] tracking-tight text-white md:text-6xl">
+              Stop guessing where to start.
+            </h1>
+            <p className="mt-6 max-w-2xl font-body text-base leading-relaxed text-ink-soft md:text-lg">
+              TruePath maps out real career paths as staged roadmaps — free resources,
+              the right order, and exactly what it leads to.
+            </p>
             <Link
               href="/signup"
-              className="rounded-md bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
+              className="mt-8 inline-block rounded-lg bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
             >
               Get started — it&apos;s free
             </Link>
-            <a
-              href="#solution"
-              className="font-body text-sm text-ink-soft transition-colors hover:text-white"
-            >
-              See how it works ↓
-            </a>
           </div>
         </div>
       </section>
 
-      <section className="bg-paper text-ink">
+      <section className="relative z-10 px-6 pb-8 md:pb-12">
+        <div className="mx-auto w-fit max-w-full rounded-full border border-white/10 bg-white/5 px-6 py-2 text-center font-body text-xs leading-relaxed text-ink-soft backdrop-blur-md sm:text-sm">
+          Validated in Razorpay&apos;s Top 10,000 Problems of India initiative — ranked Top 10, scored 88/100
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-ink/70">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="max-w-xl font-display text-2xl font-bold leading-snug md:text-3xl">
+          <p className="font-mono text-xs tracking-[0.15em] text-amber">THE PROBLEM</p>
+          <h2 className="mt-3 max-w-xl font-display text-2xl font-bold leading-snug text-white md:text-3xl">
             Self-directed learners keep hitting the same three walls.
           </h2>
-          <div className="mt-12 grid gap-10 border-t border-paper-line pt-10 md:grid-cols-3">
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
             {problems.map((problem) => (
-              <div key={problem.label}>
-                <p className="font-mono text-xs tracking-[0.15em] text-ink/50">
-                  {problem.label}
-                </p>
-                <p className="mt-3 font-body text-sm leading-relaxed text-ink/80">
-                  {problem.body}
-                </p>
-              </div>
+              <article
+                key={problem.label}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
+              >
+                <p className="font-mono text-xs tracking-[0.15em] text-amber">{problem.label}</p>
+                <p className="mt-4 font-body text-sm leading-relaxed text-ink-soft">{problem.body}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="solution" className="scroll-mt-8 border-t border-ink-line">
+      <section id="solution" className="scroll-mt-24">
         <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 md:grid-cols-2 md:items-center">
           <div>
-            <p className="font-mono text-xs tracking-[0.15em] text-amber">THE SOLUTION</p>
-            <h2 className="mt-3 font-display text-2xl font-bold md:text-3xl">
-              How TruePath works.
+            <p className="font-mono text-xs tracking-[0.15em] text-route">THE SOLUTION</p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-white md:text-3xl">
+              A roadmap built around the questions that matter.
             </h2>
             <p className="mt-5 max-w-lg font-body text-sm leading-relaxed text-ink-soft">
-              Every path on TruePath answers the same four questions, so you can
-              understand the destination before committing your time to the journey.
+              TruePath turns an uncertain career decision into a sequence you can understand,
+              follow, and return to on your own terms.
             </p>
           </div>
           <RoutePath />
         </div>
       </section>
 
-      <section className="border-t border-ink-line bg-paper text-ink">
+      <section className="border-y border-white/10 bg-ink/70">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <p className="font-mono text-xs tracking-[0.15em] text-ink/50">GET STARTED</p>
-          <h2 className="mt-3 font-display text-2xl font-bold md:text-3xl">
-            A clearer next step is waiting.
+          <p className="font-mono text-xs tracking-[0.15em] text-amber">HOW IT WORKS</p>
+          <h2 className="mt-3 font-display text-2xl font-bold text-white md:text-3xl">
+            Start with the information. Keep the momentum.
           </h2>
-          <div className="mt-12 grid gap-10 border-t border-paper-line pt-10 md:grid-cols-3">
-            {gettingStarted.map((item) => (
-              <div key={item.step}>
-                <p className="font-mono text-xs text-amber">{item.step}</p>
-                <p className="mt-2 font-display text-lg font-medium">{item.title}</p>
-                <p className="mt-2 font-body text-sm leading-relaxed text-ink/80">{item.body}</p>
-              </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {howItWorks.map((item) => (
+              <article
+                key={item.step}
+                className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md sm:p-8"
+              >
+                <p className="font-mono text-xs text-route">{item.step}</p>
+                <h3 className="mt-3 font-display text-xl font-medium text-white">{item.title}</h3>
+                <p className="mt-3 font-body text-sm leading-relaxed text-ink-soft">{item.body}</p>
+              </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-paper text-ink">
+        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <p className="font-mono text-xs tracking-[0.15em] text-ink/50">WHO IT&apos;S FOR</p>
+          <h2 className="mx-auto mt-4 max-w-3xl font-display text-2xl font-bold leading-snug md:text-3xl">
+            Anyone figuring out where to start — whether you left formal education,
+            are studying alongside it, or are pivoting into something new.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl font-body text-base leading-relaxed text-ink/75">
+            No age or background requirement. Just the willingness to learn on your own terms.
+          </p>
           <Link
             href="/signup"
-            className="mt-12 inline-block rounded-md bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
+            className="mt-8 inline-block rounded-lg bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
           >
-            Sign up
+            Get started — it&apos;s free
           </Link>
         </div>
       </section>
 
-      <footer className="border-t border-ink-line">
+      <footer className="border-t border-white/10 bg-ink-deep">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="grid gap-12 md:grid-cols-[1.7fr_repeat(3,1fr)]">
             <div>
-              <Link href="/" className="font-display text-xl font-bold tracking-tight">
-                TruePath
+              <Link href="/" className="flex w-fit items-center gap-2.5 rounded-md focus-visible:outline-offset-4">
+                <Image src={logo} alt="" className="h-7 w-7" />
+                <span className="font-display text-xl font-bold tracking-tight">TruePath</span>
               </Link>
               <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-ink-soft">
                 Structured career guidance for self-directed learners.
@@ -192,7 +197,7 @@ export default function LandingPage() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="font-body text-sm text-ink-soft transition-colors hover:text-white"
+                        className="rounded-sm font-body text-sm text-ink-soft transition-colors hover:text-white"
                       >
                         {link.label}
                       </Link>
@@ -202,7 +207,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <p className="mt-14 border-t border-ink-line pt-6 font-mono text-xs text-ink-soft">
+          <p className="mt-14 border-t border-white/10 pt-6 font-mono text-xs text-ink-soft">
             © 2026 TruePath. Built for people figuring it out on their own terms.
           </p>
         </div>
