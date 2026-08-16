@@ -1,15 +1,21 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import pathsRouter from "./routes/paths.route.js";
-import progressRouter from "./routes/progress.route.js";
-import authRouter from "./routes/auth.route.js";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import pathsRoute from './routes/paths.route';
+
+dotenv.config();
 
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN, credentials: true }));
+app.use(cors());
 app.use(express.json());
-app.use("/api/paths", pathsRouter);
-app.use("/api/progress", progressRouter);
-app.use("/api/auth", authRouter);
-app.listen(Number(process.env.PORT ?? 4000), () => console.log("TruePath API running"));
 
+app.use('/api/paths', pathsRoute);
+
+app.get('/', (req, res) => {
+  res.send('TruePath API is running');
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

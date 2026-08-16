@@ -1,6 +1,9 @@
-import { Router } from "express";
-const router = Router();
-router.get("/", (_req, res) => res.json([]));
-router.get("/:slug", (req, res) => res.json({ slug: req.params.slug }));
-export default router;
+import { Router } from 'express';
+import { listPaths, getPath } from '../controllers/paths.controller';
 
+const router = Router();
+
+router.get('/', listPaths);
+router.get('/:slug', getPath);
+
+export default router;
