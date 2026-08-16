@@ -1,6 +1,10 @@
 import type { Path } from "@/lib/types/path-tree";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const apiUrl = process.env.API_URL;
+
+if (!apiUrl) {
+  throw new Error("Missing API_URL environment variable");
+}
 
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiUrl}${path}`, init);

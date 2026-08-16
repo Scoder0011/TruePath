@@ -1,34 +1,38 @@
-import { getPath } from "@/lib/api/client";
-import { pathToTree } from "@/lib/types/path-tree";
-import CanvasTree from "@/components/path-tree/CanvasTree";
+import Link from "next/link";
+import { getAllPaths } from "@/lib/api/client";
 
-// app/paths/[pathSlug]/page.tsx is a Server Component — it runs on the
-// server, fetches from the Express backend directly, and sends the tree
-// data down as a plain prop. CanvasTree itself is "use client" because
-// it needs pointer/drag events, which only work in the browser.
-export default async function PathPage({
-  params,
-}: {
-  params: { pathSlug: string };
-}) {
-  const path = await getPath(params.pathSlug);
-  const tree = pathToTree(path);
+export const dynamic = "force-dynamic";
+
+export default async function PathsPage() {
+  const paths = await getAllPaths();
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
-      <p className="font-mono text-xs tracking-[0.15em] text-amber">PATH</p>
-      <h1 className="mt-2 font-display text-3xl font-bold text-white">
-        {path.name}
-      </h1>
-      {path.description && (
-        <p className="mt-3 max-w-2xl font-body text-sm leading-relaxed text-ink-soft">
-          {path.description}
-        </p>
-      )}
+      <p className="font-mono text-xs tracking-[0.15em] text-amber">PATHS</p>
+      <h1 className="mt-2 font-display text-3xl font-bold text-white">Explore career paths</h1>
+      <p className="mt-3 max-w-2xl font-body text-sm leading-relaxed text-ink-soft">
+        Choose a path to explore its specializations, stages, and learning resources.
+      </p>
 
-      <div className="mt-8">
-        <CanvasTree root={tree} />
-      </div>
+      {paths.length === 0 ? (
+        <p className="mt-10 font-body text-sm text-ink-soft">No paths are available yet.</p>
+      ) : (
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {paths.map((path) => (
+            <Link
+              key={path.id}
+              href={`/paths/${path.slug}`}
+              className="group rounded-lg border border-ink-line p-6 transition-colors hover:border-amber"
+            >
+              <p className="font-display text-xl font-medium text-white group-hover:text-amber">{path.name}</p>
+              {path.description && (
+                <p className="mt-3 font-body text-sm leading-relaxed text-ink-soft">{path.description}</p>
+              )}
+              <p className="mt-6 font-mono text-xs tracking-[0.12em] text-route">VIEW PATH →</p>
+            </Link>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
