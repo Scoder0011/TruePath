@@ -8,7 +8,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "ink-deep": "#070B12",
+        "ink-deep": "#080B12",// slightly darker than ink — used as the base page background behind the glass cards
         ink: "#0E1420",       // primary dark background
         "ink-line": "#263042", // borders/dividers on dark bg
         "ink-soft": "#8A94A6", // secondary text on dark bg

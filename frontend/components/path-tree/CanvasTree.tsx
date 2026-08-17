@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import type { TreeNode } from "@/lib/types/path-tree";
 
 const COLUMN_WIDTH = 260;
@@ -14,16 +14,13 @@ type Edge = { x1: number; y1: number; x2: number; y2: number };
 const kindColor: Record<TreeNode["kind"], string> = {
   path: "border-amber text-amber",
   subPath: "border-route text-route",
-  stage: "border-ink-line text-white",
-  resource: "border-ink-line text-ink-soft",
+  stage: "border-white/15 text-white",
+  resource: "border-white/15 text-ink-soft",
 };
 
 // Recursively computes {x, y} for every visible node (respecting which
 // nodes are expanded) and the connector lines between parent and child.
-// x comes from depth (one column per tree level). y is either the next
-// slot in a running row counter (for leaves / collapsed nodes) or the
-// average of its children's y (for expanded parents) — a standard tidy
-// tree layout, which is what gives the OSINT-Framework "branches fan
+// Standard tidy-tree layout — gives the OSINT-Framework "branches fan
 // out and re-converge" look instead of a flat indented list.
 function layout(
   node: TreeNode,
@@ -63,7 +60,35 @@ function layout(
   return pos;
 }
 
-export default function CanvasTree({ root }: { root: TreeNode }) {
+// Finds every node whose label matches the query, and returns the set of
+// all their ancestor ids — so those branches can be force-expanded even
+// if the user never manually clicked into them.
+function findMatchesAndAncestors(
+  node: TreeNode,
+  query: string,
+  ancestors: string[],
+  matchIds: Set<string>,
+  ancestorIds: Set<string>
+) {
+  const isMatch = query.length > 0 && node.label.toLowerCase().includes(query.toLowerCase());
+  if (isMatch) {
+    matchIds.add(node.id);
+    ancestors.forEach((id) => ancestorIds.add(id));
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      findMatchesAndAncestors(child, query, [...ancestors, node.id], matchIds, ancestorIds);
+    }
+  }
+}
+
+export default function CanvasTree({
+  root,
+  searchQuery = "",
+}: {
+  root: TreeNode;
+  searchQuery?: string;
+}) {
   // Path node starts expanded so the first column of sub-paths is
   // visible immediately; everything deeper starts collapsed.
   const [expanded, setExpanded] = useState<Set<string>>(new Set([root.id]));
@@ -71,12 +96,27 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
   const [zoom, setZoom] = useState(1);
   const dragState = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
 
+  const { matchIds, ancestorIds } = useMemo(() => {
+    const matchIds = new Set<string>();
+    const ancestorIds = new Set<string>();
+    findMatchesAndAncestors(root, searchQuery, [], matchIds, ancestorIds);
+    return { matchIds, ancestorIds };
+  }, [root, searchQuery]);
+
+  // Search results auto-expand their ancestor chain on top of whatever
+  // the user has manually toggled, so a match is always reachable
+  // without hand-clicking through every branch.
+  const effectiveExpanded = useMemo(() => {
+    if (!searchQuery) return expanded;
+    return new Set([...expanded, ...ancestorIds]);
+  }, [expanded, ancestorIds, searchQuery]);
+
   const { positions, edges } = useMemo(() => {
     const positions = new Map<string, Position>();
     const edges: Edge[] = [];
-    layout(root, 0, expanded, { n: 0 }, positions, edges);
+    layout(root, 0, effectiveExpanded, { n: 0 }, positions, edges);
     return { positions, edges };
-  }, [root, expanded]);
+  }, [root, effectiveExpanded]);
 
   const toggle = useCallback((node: TreeNode) => {
     if (!node.children?.length) return; // resource nodes have no toggle
@@ -108,7 +148,7 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
     setZoom((z) => Math.min(1.6, Math.max(0.5, z - e.deltaY * 0.001)));
   };
 
-  const nodes = useMemo(() => flattenVisible(root, expanded), [root, expanded]);
+  const nodes = useMemo(() => flattenVisible(root, effectiveExpanded), [root, effectiveExpanded]);
 
   const contentBounds = useMemo(() => {
     let maxX = 0;
@@ -121,19 +161,19 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
   }, [positions]);
 
   return (
-    <div className="relative h-[70vh] w-full overflow-hidden rounded-lg border border-ink-line bg-ink">
+    <div className="relative h-[70vh] w-full overflow-hidden rounded-2xl border border-white/10 bg-ink-deep/60 backdrop-blur-xl">
       {/* Zoom controls */}
-      <div className="absolute right-4 top-4 z-10 flex flex-col gap-1 rounded-md border border-ink-line bg-ink/90 p-1 backdrop-blur">
+      <div className="absolute right-4 top-4 z-10 flex flex-col gap-1 rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
         <button
           onClick={() => setZoom((z) => Math.min(1.6, z + 0.15))}
-          className="h-8 w-8 rounded font-mono text-sm text-white hover:bg-ink-line"
+          className="h-8 w-8 rounded-lg font-mono text-sm text-white hover:bg-white/10"
           aria-label="Zoom in"
         >
           +
         </button>
         <button
           onClick={() => setZoom((z) => Math.max(0.5, z - 0.15))}
-          className="h-8 w-8 rounded font-mono text-sm text-white hover:bg-ink-line"
+          className="h-8 w-8 rounded-lg font-mono text-sm text-white hover:bg-white/10"
           aria-label="Zoom out"
         >
           −
@@ -143,7 +183,7 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
             setZoom(1);
             setPan({ x: 40, y: 40 });
           }}
-          className="h-8 w-8 rounded font-mono text-[10px] text-white hover:bg-ink-line"
+          className="h-8 w-8 rounded-lg font-mono text-[10px] text-white hover:bg-white/10"
           aria-label="Reset view"
         >
           ⟲
@@ -180,7 +220,7 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
               <path
                 key={i}
                 d={`M ${edge.x1} ${edge.y1} C ${edge.x1 + 60} ${edge.y1}, ${edge.x2 - 60} ${edge.y2}, ${edge.x2} ${edge.y2}`}
-                stroke="#263042"
+                stroke="rgba(255,255,255,0.12)"
                 strokeWidth={1.5}
                 fill="none"
               />
@@ -190,7 +230,8 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
           {nodes.map((node) => {
             const pos = positions.get(node.id)!;
             const isLeaf = !node.children?.length;
-            const isOpen = expanded.has(node.id);
+            const isOpen = effectiveExpanded.has(node.id);
+            const isMatch = matchIds.has(node.id);
             return (
               <div
                 key={node.id}
@@ -202,7 +243,9 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
                     href={node.url}
                     target="_blank"
                     rel="noreferrer"
-                    className={`flex h-11 items-center justify-between rounded-md border bg-ink px-3 font-body text-sm text-white transition-colors hover:border-route ${kindColor[node.kind]}`}
+                    className={`flex h-11 items-center justify-between rounded-lg border bg-white/5 px-3 font-body text-sm text-white backdrop-blur-md transition-colors hover:border-route ${kindColor[node.kind]} ${
+                      isMatch ? "ring-2 ring-amber" : ""
+                    }`}
                   >
                     <span className="truncate">{node.label}</span>
                     <span className="ml-2 shrink-0 font-mono text-[10px] text-route">↗</span>
@@ -210,7 +253,9 @@ export default function CanvasTree({ root }: { root: TreeNode }) {
                 ) : (
                   <button
                     onClick={() => toggle(node)}
-                    className={`flex h-11 w-full items-center justify-between rounded-md border bg-ink px-3 text-left font-body text-sm text-white transition-colors hover:border-amber ${kindColor[node.kind]}`}
+                    className={`flex h-11 w-full items-center justify-between rounded-lg border bg-white/5 px-3 text-left font-body text-sm text-white backdrop-blur-md transition-colors hover:border-amber ${kindColor[node.kind]} ${
+                      isMatch ? "ring-2 ring-amber" : ""
+                    }`}
                   >
                     <span className="truncate">{node.label}</span>
                     {!isLeaf && (
