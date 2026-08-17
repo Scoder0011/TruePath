@@ -86,7 +86,7 @@ export default function LandingPage() {
               the right order, and exactly what it leads to.
             </p>
             <Link
-              href="/signup"
+              href="/paths"
               className="mt-8 inline-block rounded-lg bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
             >
               Get started — it&apos;s free
@@ -169,7 +169,7 @@ export default function LandingPage() {
             No age or background requirement. Just the willingness to learn on your own terms.
           </p>
           <Link
-            href="/signup"
+            href="/paths"
             className="mt-8 inline-block rounded-lg bg-amber px-6 py-3 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
           >
             Get started — it&apos;s free
