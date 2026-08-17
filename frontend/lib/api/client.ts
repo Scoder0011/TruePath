@@ -9,7 +9,10 @@ if (!apiUrl) {
 }
 
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${apiUrl}${path}`, init);
+  const response = await fetch(`${apiUrl}${path}`, {
+    cache: "no-store",
+    ...init,
+  });
   if (!response.ok) throw new Error(`API request failed: ${response.status}`);
   return response.json() as Promise<T>;
 }
