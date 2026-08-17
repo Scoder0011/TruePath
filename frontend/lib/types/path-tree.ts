@@ -5,21 +5,21 @@
 
 export type Resource = {
   id: string;
-  name: string;
+  title: string;
   url: string;
-  type?: string; // e.g. "video", "article", "lab", "course"
+  type?: string; // e.g. "video", "article", "practice", "course"
 };
 
 export type Stage = {
   id: string;
-  name: string;
+  title: string;
   resources: Resource[];
 };
 
 export type SubPath = {
   id: string;
   slug: string;
-  name: string;
+  title: string;
   description?: string;
   stages: Stage[];
 };
@@ -27,9 +27,9 @@ export type SubPath = {
 export type Path = {
   id: string;
   slug: string;
-  name: string;
+  title: string;
   description?: string;
-  subPaths: SubPath[];
+  sub_paths: SubPath[];
 };
 
 // The tree component doesn't know about Path/SubPath/Stage/Resource
@@ -47,19 +47,19 @@ export type TreeNode = {
 export function pathToTree(path: Path): TreeNode {
   return {
     id: path.id,
-    label: path.name,
+    label: path.title,
     kind: "path",
-    children: path.subPaths.map((sp) => ({
+    children: (path.sub_paths ?? []).map((sp) => ({
       id: sp.id,
-      label: sp.name,
+      label: sp.title,
       kind: "subPath",
-      children: sp.stages.map((stage) => ({
+      children: (sp.stages ?? []).map((stage) => ({
         id: stage.id,
-        label: stage.name,
+        label: stage.title,
         kind: "stage",
-        children: stage.resources.map((r) => ({
+        children: (stage.resources ?? []).map((r) => ({
           id: r.id,
-          label: r.name,
+          label: r.title,
           kind: "resource",
           url: r.url,
         })),
