@@ -26,8 +26,9 @@ export default function PathsPage() {
         if (cancelled) return;
         setTree(pathToTree(path));
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) return;
+        console.error(`Failed to load path "${domain.slug}"`, error);
         setError(`Couldn't load the ${domain.name} path. Try again in a moment.`);
       })
       .finally(() => {

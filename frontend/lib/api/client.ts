@@ -13,7 +13,14 @@ export async function apiClient<T>(path: string, init?: RequestInit): Promise<T>
     cache: "no-store",
     ...init,
   });
-  if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(
+      `API request failed: ${response.status} ${response.statusText}${
+        detail ? ` — ${detail}` : ""
+      }`,
+    );
+  }
   return response.json() as Promise<T>;
 }
 

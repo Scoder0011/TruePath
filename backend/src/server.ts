@@ -6,6 +6,9 @@ import pathsRoute from './routes/paths.route';
 dotenv.config();
 
 const app = express();
+// API responses are dynamic. Disabling ETags prevents Express from turning a
+// conditional browser request into a body-less 304 response.
+app.disable('etag');
 app.use(cors());
 app.use(express.json());
 

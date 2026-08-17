@@ -5,7 +5,7 @@ import { getAllPaths, getPathWithFullTree } from '../models/path.model';
 export async function listPaths(req: Request, res: Response) {
   try {
     const paths = await getAllPaths();
-    res.json(paths);
+    res.set('Cache-Control', 'no-store, max-age=0').json(paths);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -14,7 +14,7 @@ export async function listPaths(req: Request, res: Response) {
 export async function getPath(req: Request, res: Response) {
   try {
     const path = await getPathWithFullTree(req.params.slug);
-    res.json(path);
+    res.set('Cache-Control', 'no-store, max-age=0').json(path);
   } catch (err: any) {
     res.status(404).json({ error: 'Path not found' });
   }
