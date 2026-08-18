@@ -1,26 +1,51 @@
-// Mirrors the shapes described in shared/types/paths.ts (README).
-// Once the shared/ workspace package exists, delete this file and import
-// from "@truepath/shared" (or whatever the package gets named) instead —
-// keeping one copy of these types is the whole point of the shared folder.
+// Mirrors the new database schema:
+// paths → specializations → stages → topics → resources
+// Plus notes attached to stages.
 
 export type Resource = {
   id: string;
+  title: string | null;
+  url: string | null;
+  type: string;
+  is_free: boolean;
+  order_index: number;
+};
+
+export type Topic = {
+  id: string;
+  slug: string;
   title: string;
-  url: string;
-  type?: string; // e.g. "video", "article", "practice", "course"
+  description?: string | null;
+  order_index: number;
+  resources: Resource[];
+};
+
+export type Note = {
+  id: string;
+  content: string;
+  after_topic_slug: string | null;
+  order_index: number;
 };
 
 export type Stage = {
   id: string;
+  slug: string;
   title: string;
-  resources: Resource[];
+  description?: string | null;
+  order_index: number;
+  topics: Topic[];
+  notes: Note[];
 };
 
-export type SubPath = {
+export type Specialization = {
   id: string;
   slug: string;
   title: string;
-  description?: string;
+  description?: string | null;
+  prerequisites?: string | null;
+  duration?: string | null;
+  career_outcomes?: string | null;
+  order_index: number;
   stages: Stage[];
 };
 
@@ -28,19 +53,18 @@ export type Path = {
   id: string;
   slug: string;
   title: string;
-  description?: string;
-  sub_paths: SubPath[];
+  description?: string | null;
+  order_index: number;
+  specializations: Specialization[];
 };
 
-// The tree component doesn't know about Path/SubPath/Stage/Resource
-// specifically — it only knows about generic TreeNodes. This keeps
-// CanvasTree reusable if a future path (e.g. Web Development) has a
-// differently-shaped hierarchy.
+// Generic tree node — CanvasTree only knows this shape,
+// keeping it reusable across any path structure.
 export type TreeNode = {
   id: string;
   label: string;
-  kind: "path" | "subPath" | "stage" | "resource";
-  url?: string; // only resource nodes typically have this
+  kind: "path" | "specialization" | "stage" | "topic" | "resource";
+  url?: string;
   children?: TreeNode[];
 };
 
@@ -49,21 +73,34 @@ export function pathToTree(path: Path): TreeNode {
     id: path.id,
     label: path.title,
     kind: "path",
-    children: (path.sub_paths ?? []).map((sp) => ({
-      id: sp.id,
-      label: sp.title,
-      kind: "subPath",
-      children: (sp.stages ?? []).map((stage) => ({
-        id: stage.id,
-        label: stage.title,
-        kind: "stage",
-        children: (stage.resources ?? []).map((r) => ({
-          id: r.id,
-          label: r.title,
-          kind: "resource",
-          url: r.url,
-        })),
+    children: (path.specializations ?? [])
+      .sort((a, b) => a.order_index - b.order_index)
+      .map((spec) => ({
+        id: spec.id,
+        label: spec.title,
+        kind: "specialization",
+        children: (spec.stages ?? [])
+          .sort((a, b) => a.order_index - b.order_index)
+          .map((stage) => ({
+            id: stage.id,
+            label: stage.title,
+            kind: "stage",
+            children: (stage.topics ?? [])
+              .sort((a, b) => a.order_index - b.order_index)
+              .map((topic) => ({
+                id: topic.id,
+                label: topic.title,
+                kind: "topic",
+                children: (topic.resources ?? [])
+                  .sort((a, b) => a.order_index - b.order_index)
+                  .map((r) => ({
+                    id: r.id,
+                    label: r.title ?? r.type,
+                    kind: "resource",
+                    url: r.url ?? undefined,
+                  })),
+              })),
+          })),
       })),
-    })),
   };
 }

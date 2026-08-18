@@ -13,9 +13,10 @@ type Edge = { x1: number; y1: number; x2: number; y2: number };
 
 const kindColor: Record<TreeNode["kind"], string> = {
   path: "border-amber text-amber",
-  subPath: "border-route text-route",
-  stage: "border-white/15 text-white",
-  resource: "border-white/15 text-ink-soft",
+  specialization: "border-route text-route",
+  stage: "border-white/20 text-white",
+  topic: "border-white/10 text-ink-soft",
+  resource: "border-white/5 text-ink-soft",
 };
 
 // Recursively computes {x, y} for every visible node (respecting which
