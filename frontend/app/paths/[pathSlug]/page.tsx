@@ -1,364 +1,627 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import CanvasTree from "@/components/path-tree/CanvasTree";
-import { getPath } from "@/lib/api/client";
-import { pathToTree, type Path, type TreeNode } from "@/lib/types/path-tree";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
-type SidebarCard = {
+type PathOption = {
+  id: string;
+  slug: string;
   title: string;
-  description?: string | null;
-  prerequisites?: string | null;
-  duration?: string | null;
-  career_outcomes?: string | null;
-  resources?: Array<{
-    title: string;
-    url: string | null;
-    type: string;
-    isFree: boolean;
-  }>;
-  kind?: "path" | "specialization" | "stage" | "topic" | "resource";
-  typeLabel?: string;
-  url?: string | null;
+  description: string;
+  status: "active" | "coming_soon";
 };
 
-function getDefaultPathInfo(pathData: Path): SidebarCard {
-  const primarySpec =
-    pathData.specializations.find(
-      (specialization) => (specialization.stages ?? []).some((stage) => (stage.topics ?? []).length > 0),
-    ) ?? pathData.specializations[0];
+type SpecializationItem = {
+  id: string;
+  label: string;
+  slug: string;
+  status: "active" | "coming_soon";
+  description: string;
+  whoFor: string;
+  duration: string;
+};
 
-  return {
-    title: pathData.title,
-    description: pathData.description ?? "",
-    prerequisites: primarySpec?.prerequisites ?? "No formal prerequisites listed yet.",
-    duration: primarySpec?.duration ?? "Flexible",
-    career_outcomes: primarySpec?.career_outcomes ?? "Career outcomes will be added soon.",
-    kind: "path",
-  };
-}
+type TeamNode = {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  specializations: SpecializationItem[];
+};
 
-function getNodeDetail(node: TreeNode, pathData: Path): SidebarCard | null {
-  if (node.kind === "path") {
-    return {
-      title: pathData.title,
-      description: pathData.description ?? "",
-      kind: "path",
-    };
-  }
+const PATHS: PathOption[] = [
+  {
+    id: "cybersecurity",
+    slug: "cybersecurity",
+    title: "Cybersecurity",
+    description: "Learn to protect systems, networks, and data from digital attacks.",
+    status: "active",
+  },
+  {
+    id: "web-development",
+    slug: "web-development",
+    title: "Web Development",
+    description: "Build full-stack web applications.",
+    status: "coming_soon",
+  },
+  {
+    id: "data-science",
+    slug: "data-science",
+    title: "Data Science",
+    description: "Work with data, build models, and extract insights.",
+    status: "coming_soon",
+  },
+  {
+    id: "cloud-devops",
+    slug: "cloud-devops",
+    title: "Cloud & DevOps",
+    description: "Deploy and manage scalable infrastructure.",
+    status: "coming_soon",
+  },
+];
 
-  if (node.kind === "specialization") {
-    const specialization = pathData.specializations.find((item) => item.id === node.id);
-    if (!specialization) return null;
+const CYBERSECURITY_TREE: TeamNode[] = [
+  {
+    id: "red-team",
+    label: "Red Team — Offensive",
+    description: "Finding and exploiting weaknesses before real attackers do.",
+    icon: "⚔️",
+    specializations: [
+      {
+        id: "penetration-testing",
+        label: "Penetration Testing",
+        slug: "penetration-testing",
+        status: "active",
+        description:
+          "Test systems, networks, and apps for exploitable vulnerabilities under a defined scope.",
+        whoFor: "People who like breaking things methodically and writing reports.",
+        duration: "10–15 months",
+      },
+      {
+        id: "red-team-ops",
+        label: "Red Team Operations",
+        slug: "red-team-ops",
+        status: "coming_soon",
+        description: "Full adversary simulation campaigns mimicking real attacker TTPs.",
+        whoFor: "Experienced pentesters ready to go beyond scoped assessments.",
+        duration: "Advanced",
+      },
+      {
+        id: "bug-bounty",
+        label: "Bug Bounty Hunting",
+        slug: "bug-bounty",
+        status: "coming_soon",
+        description: "Find vulnerabilities in real production systems for monetary rewards.",
+        whoFor: "Self-directed learners who want flexible, outcome-based work.",
+        duration: "Ongoing",
+      },
+      {
+        id: "vuln-research",
+        label: "Vulnerability Research & Exploit Dev",
+        slug: "vuln-research",
+        status: "coming_soon",
+        description: "Discover new vulnerabilities and write working exploits.",
+        whoFor: "People who like low-level systems, C/C++, and original research.",
+        duration: "Advanced",
+      },
+      {
+        id: "web-app-pentest",
+        label: "Web App Pentesting",
+        slug: "web-app-pentest",
+        status: "coming_soon",
+        description: "Specialize in finding and exploiting web application vulnerabilities.",
+        whoFor: "People focused on web technologies and browser-based attack surfaces.",
+        duration: "6–10 months",
+      },
+      {
+        id: "mobile-security",
+        label: "Mobile App Security Testing",
+        slug: "mobile-security",
+        status: "coming_soon",
+        description: "Assess iOS and Android applications for security weaknesses.",
+        whoFor: "People interested in mobile platforms and reverse engineering apps.",
+        duration: "6–8 months",
+      },
+      {
+        id: "network-infra-pentest",
+        label: "Network & Infrastructure Pentesting",
+        slug: "network-infra-pentest",
+        status: "coming_soon",
+        description: "Test internal and external network infrastructure for vulnerabilities.",
+        whoFor: "People who like networking, protocols, and Active Directory attacks.",
+        duration: "8–12 months",
+      },
+      {
+        id: "social-engineering",
+        label: "Social Engineering",
+        slug: "social-engineering",
+        status: "coming_soon",
+        description: "Human-focused attacks — phishing campaigns, pretexting, physical security.",
+        whoFor: "People with strong communication skills and interest in human psychology.",
+        duration: "4–6 months",
+      },
+      {
+        id: "hardware-iot",
+        label: "Hardware / Embedded / IoT Hacking",
+        slug: "hardware-iot",
+        status: "coming_soon",
+        description: "Attack physical devices, embedded systems, and IoT products.",
+        whoFor: "People with electronics/hardware interest alongside software skills.",
+        duration: "Advanced",
+      },
+      {
+        id: "blockchain-security",
+        label: "Blockchain / Smart Contract / Web3 Security",
+        slug: "blockchain-security",
+        status: "coming_soon",
+        description: "Audit smart contracts and find vulnerabilities in Web3 protocols.",
+        whoFor: "People with programming background interested in blockchain technology.",
+        duration: "6–9 months",
+      },
+    ],
+  },
+  {
+    id: "blue-team",
+    label: "Blue Team — Defensive",
+    description: "Detecting, responding to, and preventing attacks.",
+    icon: "🛡️",
+    specializations: [
+      {
+        id: "soc-analyst",
+        label: "SOC Analyst",
+        slug: "soc-analyst",
+        status: "coming_soon",
+        description: "Monitor alerts, triage incidents, and escalate threats in a Security Operations Center.",
+        whoFor: "People who like investigation, pattern recognition, and working under pressure.",
+        duration: "4–6 months",
+      },
+      {
+        id: "incident-response",
+        label: "Incident Response",
+        slug: "incident-response",
+        status: "coming_soon",
+        description: "Contain and remediate active security breaches.",
+        whoFor: "People who stay calm under pressure and like solving live problems fast.",
+        duration: "6–9 months",
+      },
+      {
+        id: "threat-hunting",
+        label: "Threat Hunting",
+        slug: "threat-hunting",
+        status: "coming_soon",
+        description: "Proactively search for threats that evaded automated detection.",
+        whoFor: "Experienced defenders with strong analytical and hypothesis-driven thinking.",
+        duration: "Advanced",
+      },
+      {
+        id: "digital-forensics",
+        label: "Digital Forensics",
+        slug: "digital-forensics",
+        status: "coming_soon",
+        description: "Investigate security incidents by recovering and analyzing digital evidence.",
+        whoFor: "Detail-oriented people who like piecing together what happened after an attack.",
+        duration: "6–9 months",
+      },
+      {
+        id: "malware-analysis",
+        label: "Malware Analysis & Reverse Engineering",
+        slug: "malware-analysis",
+        status: "coming_soon",
+        description: "Dissect malicious software to understand how it works and what it does.",
+        whoFor: "People who like low-level code, assembly, and understanding attacker tools deeply.",
+        duration: "Advanced",
+      },
+      {
+        id: "detection-engineering",
+        label: "Detection Engineering",
+        slug: "detection-engineering",
+        status: "coming_soon",
+        description: "Build and tune detection rules that power SOC alerts and SIEM platforms.",
+        whoFor: "People who like coding + security + data — writing rules that catch real attacks.",
+        duration: "6–9 months",
+      },
+      {
+        id: "security-engineering",
+        label: "Security Engineering",
+        slug: "security-engineering",
+        status: "coming_soon",
+        description: "Build security tooling, platforms, and infrastructure for an organization.",
+        whoFor: "Software engineers pivoting into security who like building internal tools.",
+        duration: "8–12 months",
+      },
+      {
+        id: "iam",
+        label: "Identity & Access Management (IAM)",
+        slug: "iam",
+        status: "coming_soon",
+        description: "Manage who has access to what — authentication, authorization, and identity systems.",
+        whoFor: "People interested in enterprise systems, compliance, and access control design.",
+        duration: "4–6 months",
+      },
+    ],
+  },
+  {
+    id: "purple-team",
+    label: "Purple Team — Hybrid",
+    description: "Combining offensive and defensive skills, bridging both sides.",
+    icon: "🔮",
+    specializations: [
+      {
+        id: "appsec",
+        label: "Application Security (AppSec)",
+        slug: "appsec",
+        status: "coming_soon",
+        description: "Secure software during development — code review, SAST/DAST, secure SDLC.",
+        whoFor: "Developers who want to specialize in security or security people who can code.",
+        duration: "6–9 months",
+      },
+      {
+        id: "cloud-security",
+        label: "Cloud Security",
+        slug: "cloud-security",
+        status: "coming_soon",
+        description: "Secure cloud infrastructure across AWS, Azure, and GCP.",
+        whoFor: "People interested in cloud platforms, infrastructure, and automation.",
+        duration: "6–9 months",
+      },
+      {
+        id: "devsecops",
+        label: "DevSecOps",
+        slug: "devsecops",
+        status: "coming_soon",
+        description: "Integrate security into CI/CD pipelines and development workflows.",
+        whoFor: "DevOps engineers or developers who want to shift security left in the SDLC.",
+        duration: "6–9 months",
+      },
+      {
+        id: "security-architecture",
+        label: "Security Architecture",
+        slug: "security-architecture",
+        status: "coming_soon",
+        description: "Design secure systems and networks from the ground up.",
+        whoFor: "Experienced security professionals moving into strategic/design roles.",
+        duration: "Advanced",
+      },
+      {
+        id: "threat-intelligence",
+        label: "Threat Intelligence",
+        slug: "threat-intelligence",
+        status: "coming_soon",
+        description: "Track attacker groups, TTPs, and feed intelligence back into defenses.",
+        whoFor: "People who like research, geopolitics, and connecting dots across data sources.",
+        duration: "6–9 months",
+      },
+      {
+        id: "ai-ml-security",
+        label: "AI / ML Security",
+        slug: "ai-ml-security",
+        status: "coming_soon",
+        description: "Secure AI systems and find vulnerabilities in machine learning models.",
+        whoFor: "People with ML background who want to apply security thinking to AI systems.",
+        duration: "Emerging field",
+      },
+      {
+        id: "grc",
+        label: "GRC (Governance, Risk & Compliance)",
+        slug: "grc",
+        status: "coming_soon",
+        description: "Frameworks, audits, risk assessments, and compliance programs.",
+        whoFor: "Less hands-on-technical people who are strong in communication and process.",
+        duration: "4–6 months",
+      },
+      {
+        id: "osint",
+        label: "Open Source Intelligence (OSINT)",
+        slug: "osint",
+        status: "coming_soon",
+        description: "Gather and analyze publicly available information for security investigations.",
+        whoFor: "People who like research, investigation, and piecing together information.",
+        duration: "3–5 months",
+      },
+    ],
+  },
+];
 
-    return {
-      title: specialization.title,
-      description: specialization.description ?? "",
-      prerequisites: specialization.prerequisites ?? "No formal prerequisites listed yet.",
-      duration: specialization.duration ?? "Flexible",
-      career_outcomes: specialization.career_outcomes ?? "Career outcomes will be added soon.",
-      kind: "specialization",
-    };
-  }
+const TEAM_STYLES: Record<string, { badge: string; chip: string }> = {
+  "red-team": { badge: "bg-red-500/10 text-red-200 border border-red-500/40", chip: "bg-red-500/10 text-red-200" },
+  "blue-team": { badge: "bg-route/10 text-route border border-route/40", chip: "bg-route/10 text-route" },
+  "purple-team": { badge: "bg-amber/10 text-amber border border-amber/40", chip: "bg-amber/10 text-amber" },
+};
 
-  if (node.kind === "stage") {
-    const stage = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .find((item) => item.id === node.id);
+export default function PathDiscoveryPage({ params }: { params: { pathSlug: string } }) {
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({
+    "red-team": true,
+    "blue-team": true,
+    "purple-team": true,
+  });
+  const [hoveredSpecId, setHoveredSpecId] = useState<string | null>(null);
+  const [hoveredTeamId, setHoveredTeamId] = useState<string | null>(null);
+  const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-    if (!stage) return null;
+  const normalizedPathSlug = PATHS.some((path) => path.slug === params.pathSlug) ? params.pathSlug : "cybersecurity";
+  const currentPath = PATHS.find((path) => path.slug === normalizedPathSlug) ?? PATHS[0];
 
-    return {
-      title: stage.title,
-      description: stage.description ?? "No stage overview yet.",
-      kind: "stage",
-    };
-  }
+  const filteredTeams = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-  if (node.kind === "topic") {
-    const topic = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .flatMap((stage) => stage.topics ?? [])
-      .find((item) => item.id === node.id);
+    return CYBERSECURITY_TREE.filter((team) => {
+      if (!query) return true;
+      return team.specializations.some((specialization) => specialization.label.toLowerCase().includes(query));
+    }).map((team) => ({
+      ...team,
+      visibleSpecializations: query
+        ? team.specializations.filter((specialization) => specialization.label.toLowerCase().includes(query))
+        : team.specializations,
+    }));
+  }, [search]);
 
-    if (!topic) return null;
+  const sidebarSpec = useMemo(() => {
+    const id = selectedSpecId ?? hoveredSpecId;
+    if (!id) return null;
+    return CYBERSECURITY_TREE.flatMap((team) => team.specializations).find((specialization) => specialization.id === id) ?? null;
+  }, [hoveredSpecId, selectedSpecId]);
 
-    return {
-      title: topic.title,
-      description: topic.description ?? "No topic summary yet.",
-      resources: (topic.resources ?? []).map((resource) => ({
-        title: resource.title ?? resource.type,
-        url: resource.url ?? null,
-        type: resource.type,
-        isFree: Boolean(resource.is_free),
-      })),
-      kind: "topic",
-    };
-  }
+  const sidebarTeam = useMemo(() => {
+    if (sidebarSpec) return null;
+    if (!hoveredTeamId) return null;
+    return CYBERSECURITY_TREE.find((team) => team.id === hoveredTeamId) ?? null;
+  }, [hoveredTeamId, sidebarSpec]);
 
-  if (node.kind === "resource") {
-    const resource = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .flatMap((stage) => stage.topics ?? [])
-      .flatMap((topic) => topic.resources ?? [])
-      .find((item) => item.id === node.id);
+  const handleSpecClick = (specialization: SpecializationItem) => {
+    setSelectedSpecId(specialization.id);
+    setHoveredSpecId(specialization.id);
+    setSheetOpen(true);
 
-    if (!resource) return null;
-
-    return {
-      title: resource.title ?? resource.type,
-      description: resource.type,
-      kind: "resource",
-      typeLabel: resource.type,
-      url: resource.url ?? null,
-      resources: [
-        {
-          title: resource.title ?? resource.type,
-          url: resource.url ?? null,
-          type: resource.type,
-          isFree: Boolean(resource.is_free),
-        },
-      ],
-    };
-  }
-
-  return null;
-}
-
-export default function PathDetailPage({ params }: { params: { pathSlug: string } }) {
-  const [path, setPath] = useState<Path | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hoveredNode, setHoveredNode] = useState<TreeNode | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    setLoading(true);
-    setError(null);
-
-    getPath(params.pathSlug)
-      .then((data) => {
-        if (cancelled) return;
-        setPath(data);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        console.error(`Failed to load path "${params.pathSlug}"`, err);
-        setError("Couldn't load this path right now. Please try again in a moment.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [params.pathSlug]);
-
-  const defaultInfo = useMemo(() => (path ? getDefaultPathInfo(path) : null), [path]);
-  const currentInfo = useMemo(() => {
-    if (!path) return defaultInfo;
-    if (!hoveredNode) return defaultInfo;
-    return getNodeDetail(hoveredNode, path) ?? defaultInfo;
-  }, [defaultInfo, hoveredNode, path]);
-
-  const renderContent = (info: SidebarCard | null) => {
-    if (!info) {
-      return <p className="font-body text-sm text-ink-soft">No details available for this node.</p>;
+    if (specialization.status === "active") {
+      router.push(`/paths/${normalizedPathSlug}/${specialization.slug}`);
     }
-
-    return (
-      <div className="space-y-5">
-        {info.kind !== "topic" && info.kind !== "resource" && (
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
-              {info.kind === "path" ? "OVERVIEW" : info.kind === "specialization" ? "DESCRIPTION" : "STAGE"}
-            </p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
-            {info.description && (
-              <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{info.description}</p>
-            )}
-          </div>
-        )}
-
-        {info.kind === "topic" && (
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">TOPIC</p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
-            {info.description && <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{info.description}</p>}
-          </div>
-        )}
-
-        {info.kind === "resource" && (
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCE</p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
-            {info.typeLabel && (
-              <div className="mt-3 flex items-center gap-2">
-                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
-                  {info.typeLabel}
-                </span>
-                <span
-                  className={[
-                    "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
-                    info.resources?.[0]?.isFree
-                      ? "bg-route/10 text-route"
-                      : "border border-white/10 bg-white/5 text-ink-soft",
-                  ].join(" ")}
-                >
-                  {info.resources?.[0]?.isFree ? "Free" : "Paid"}
-                </span>
-              </div>
-            )}
-            {info.url && (
-              <a
-                href={info.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
-              >
-                Open resource <span aria-hidden="true">→</span>
-              </a>
-            )}
-          </div>
-        )}
-
-        {info.kind !== "resource" && info.kind !== "topic" && (
-          <>
-            {info.prerequisites && (
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">PREREQUISITES</p>
-                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.prerequisites}</p>
-              </div>
-            )}
-
-            {info.duration && (
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION</p>
-                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.duration}</p>
-              </div>
-            )}
-
-            {info.career_outcomes && (
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER OUTCOMES</p>
-                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.career_outcomes}</p>
-              </div>
-            )}
-          </>
-        )}
-
-        {info.kind === "topic" && info.resources && info.resources.length > 0 && (
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCES</p>
-            <div className="mt-3 space-y-3">
-              {info.resources.map((resource) => (
-                <a
-                  key={`${resource.title}-${resource.type}-${resource.url ?? "local"}`}
-                  href={resource.url ?? undefined}
-                  target={resource.url ? "_blank" : undefined}
-                  rel={resource.url ? "noreferrer" : undefined}
-                  className="block rounded-xl border border-white/10 bg-white/5 p-3 text-left transition-colors hover:border-amber/70"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-body text-sm text-white">{resource.title}</span>
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
-                      {resource.type}
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
-                      {resource.url ? "Open" : "No link"}
-                    </span>
-                    <span
-                      className={[
-                        "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
-                        resource.isFree ? "bg-route/10 text-route" : "bg-white/5 text-ink-soft",
-                      ].join(" ")}
-                    >
-                      {resource.isFree ? "Free" : "Paid"}
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
   };
 
   return (
-    <main className="h-screen overflow-hidden bg-ink-deep">
-      <div className="relative flex h-screen flex-col md:flex-row">
-        <button
-          type="button"
-          onClick={() => setSidebarOpen((current) => !current)}
-          className="absolute left-4 top-4 z-20 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft md:hidden"
-        >
-          {sidebarOpen ? "Hide info" : "Path info"}
-        </button>
+    <main className="flex h-screen overflow-hidden bg-ink-deep">
+      <div className="flex h-full w-full flex-col lg:flex-row">
+        <aside className="border-b border-white/10 bg-ink-deep p-3 lg:h-full lg:w-[180px] lg:border-b-0 lg:border-r lg:p-4">
+          <div className="mb-4 lg:mb-6">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-amber">PATHS</p>
+          </div>
 
-        <aside
-          className={[
-            "z-10 h-full w-full border-r border-white/10 bg-white/5 backdrop-blur-xl md:w-[280px] md:shrink-0",
-            sidebarOpen ? "absolute inset-y-0 left-0 flex" : "hidden md:flex",
-          ].join(" ")}
-        >
-          <div className="flex min-h-0 w-full flex-col">
-            <div className="px-4 pb-3 pt-4">
-              <Link href="/paths" className="font-mono text-xs text-ink-soft transition-opacity hover:opacity-80">
-                ← Back to all paths
-              </Link>
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
+            {PATHS.map((path) => {
+              const isCurrent = path.slug === normalizedPathSlug;
+              const isActive = path.status === "active";
 
-              <div className="mt-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER PATH</p>
-                <h1 className="mt-2 font-display text-2xl font-bold text-white">
-                  {path?.title ?? "Loading..."}
-                </h1>
-              </div>
-
-              <div className="mt-4 border-t border-white/10" />
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 pb-6">
-              {loading && (
-                <div className="flex min-h-[220px] items-center justify-center">
-                  <p className="font-mono text-sm text-ink-soft">Loading path details…</p>
-                </div>
-              )}
-
-              {!loading && error && (
-                <div className="flex min-h-[220px] items-center justify-center text-center">
-                  <p className="font-body text-sm text-red-400">{error}</p>
-                </div>
-              )}
-
-              {!loading && !error && currentInfo && renderContent(currentInfo)}
-            </div>
+              return (
+                <Link
+                  key={path.slug}
+                  href={isActive ? `/paths/${path.slug}` : "#"}
+                  aria-disabled={!isActive}
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={(event) => {
+                    if (!isActive) event.preventDefault();
+                  }}
+                  className={[
+                    "group shrink-0 rounded-xl border px-3 py-3 text-left transition-colors lg:w-full",
+                    isCurrent
+                      ? "border-amber/80 bg-white/8 text-white"
+                      : isActive
+                        ? "border-white/10 bg-white/5 text-ink-soft hover:bg-white/8 hover:text-white"
+                        : "cursor-not-allowed border-white/5 bg-white/[0.03] text-ink-soft/70",
+                    "border-l-2",
+                    isCurrent ? "border-l-amber" : "border-l-transparent",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-body text-sm font-medium text-current">{path.title}</span>
+                    {isCurrent && <span className="h-2 w-2 rounded-full bg-amber" aria-hidden="true" />}
+                  </div>
+                  {!isActive && (
+                    <span className="mt-2 block font-mono text-[9px] uppercase tracking-[0.16em] text-ink-soft">
+                      Coming soon
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </aside>
 
-        <div className="relative h-screen flex-1 overflow-hidden">
-          {loading && (
-            <div className="flex h-full items-center justify-center border-l border-white/10 bg-ink-deep/70">
-              <p className="font-mono text-sm text-ink-soft">Loading path timeline…</p>
-            </div>
-          )}
+        <section className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-white/10 bg-ink-deep lg:border-r">
+          <div className="border-b border-white/10 bg-ink-deep px-4 py-4 lg:px-6">
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search paths..."
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/70 outline-none transition-colors focus:border-amber"
+            />
+          </div>
 
-          {!loading && error && (
-            <div className="flex h-full items-center justify-center border-l border-white/10 bg-ink-deep/70">
-              <p className="font-body text-sm text-red-400">{error}</p>
-            </div>
-          )}
+          <div className="flex-1 overflow-y-auto px-4 py-4 lg:px-6 lg:py-6">
+            <div className="space-y-4">
+              {filteredTeams.map((team) => {
+                const isExpanded = expandedTeams[team.id] ?? true;
+                const teamStyle = TEAM_STYLES[team.id];
 
-          {!loading && !error && path && (
-            <CanvasTree root={pathToTree(path)} onNodeHover={setHoveredNode} />
-          )}
-        </div>
+                if (!isExpanded) return null;
+
+                return (
+                  <div key={team.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-2">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setHoveredTeamId(team.id)}
+                      onMouseLeave={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
+                      onFocus={() => setHoveredTeamId(team.id)}
+                      onBlur={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
+                      onClick={() => setExpandedTeams((current) => ({ ...current, [team.id]: !(current[team.id] ?? true) }))}
+                      className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-white/5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-base" aria-hidden="true">{team.icon}</span>
+                        <div>
+                          <p className="font-display text-sm font-semibold text-white">{team.label}</p>
+                        </div>
+                      </div>
+
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
+                        {isExpanded ? "−" : "+"}
+                      </span>
+                    </button>
+
+                    {isExpanded && (
+                      <div className="mt-2 space-y-1 px-1 pb-1">
+                        {team.visibleSpecializations.map((specialization) => {
+                          const isSelected = selectedSpecId === specialization.id;
+                          const isHovered = hoveredSpecId === specialization.id;
+                          const isActive = specialization.status === "active";
+
+                          return (
+                            <button
+                              key={specialization.id}
+                              type="button"
+                              onMouseEnter={() => setHoveredSpecId(specialization.id)}
+                              onMouseLeave={() => setHoveredSpecId((current) => (current === specialization.id ? null : current))}
+                              onFocus={() => setHoveredSpecId(specialization.id)}
+                              onBlur={() => setHoveredSpecId((current) => (current === specialization.id ? null : current))}
+                              onClick={() => handleSpecClick(specialization)}
+                              className={[
+                                "flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
+                                isSelected
+                                  ? "border-l-2 border-amber bg-white/8"
+                                  : isHovered
+                                    ? "bg-white/5"
+                                    : "border-white/0 bg-transparent hover:bg-white/5",
+                              ].join(" ")}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate font-body text-sm text-white">{specialization.label}</p>
+                              </div>
+
+                              <span
+                                className={[
+                                  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                  isActive ? "bg-route/10 text-route" : "bg-white/5 text-ink-soft",
+                                ].join(" ")}
+                              >
+                                <span
+                                  className={[
+                                    "inline-block h-1.5 w-1.5 rounded-full",
+                                    isActive ? "bg-route" : "bg-ink-soft",
+                                  ].join(" ")}
+                                  aria-hidden="true"
+                                />
+                                {isActive ? "Active" : "Soon"}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {teamStyle && !isExpanded && (
+                      <div className="mt-2 flex gap-2 px-2 pb-1">
+                        {team.specializations.map((specialization) => (
+                          <span key={specialization.id} className={["rounded-full px-2 py-1 text-[10px]", teamStyle.chip].join(" ")}>
+                            {specialization.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {filteredTeams.length === 0 && (
+                <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+                  <p className="font-body text-sm text-ink-soft">No matching specializations found.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <aside
+          className={[
+            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-deep p-4 shadow-2xl shadow-ink-deep/60 transition-transform duration-200 lg:static lg:h-full lg:w-[300px] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
+            sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)] lg:translate-y-0",
+          ].join(" ")}
+        >
+          <div className="mb-3 flex items-center justify-between lg:hidden">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-amber">Details</p>
+            <button type="button" onClick={() => setSheetOpen(false)} className="font-body text-sm text-ink-soft">
+              Close
+            </button>
+          </div>
+
+          <div className="h-full overflow-y-auto">
+            {!sidebarSpec && !sidebarTeam && (
+              <div className="flex min-h-[220px] items-center justify-center text-center">
+                <p className="max-w-xs font-body text-base text-ink-soft">Select a path to see details</p>
+              </div>
+            )}
+
+            {sidebarTeam && (
+              <div className="space-y-5">
+                <div className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-amber">
+                  {sidebarTeam.id.replace("-", " ").toUpperCase()}
+                </div>
+
+                <div>
+                  <h2 className="font-display text-xl font-bold text-white">{sidebarTeam.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{sidebarTeam.description}</p>
+                </div>
+
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Specializations</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {sidebarTeam.specializations.map((specialization) => (
+                      <span key={specialization.id} className="rounded-full border border-white/10 bg-white/5 px-2 py-1 font-body text-[11px] text-ink-soft">
+                        {specialization.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {sidebarSpec && (
+              <div className="space-y-5">
+                <div className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-amber">
+                  {CYBERSECURITY_TREE.find((team) => team.specializations.some((specialization) => specialization.id === sidebarSpec.id))?.id.replace("-", " ").toUpperCase() ?? "PATH"}
+                </div>
+
+                <div>
+                  <h2 className="font-display text-xl font-bold text-white">{sidebarSpec.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.description}</p>
+                </div>
+
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">WHO IT&apos;S FOR:</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.whoFor}</p>
+                </div>
+
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION:</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.duration}</p>
+                </div>
+
+                {sidebarSpec.status === "active" ? (
+                  <Link
+                    href={`/paths/${normalizedPathSlug}/${sidebarSpec.slug}`}
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
+                  >
+                    Start this path <span aria-hidden="true">→</span>
+                  </Link>
+                ) : (
+                  <p className="font-body text-sm text-ink-soft">Coming soon — roadmap in progress</p>
+                )}
+              </div>
+            )}
+          </div>
+        </aside>
       </div>
     </main>
   );
