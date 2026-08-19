@@ -28,22 +28,44 @@ export default function RootLayout({
                 className="flex items-center gap-2.5 rounded-md focus-visible:outline-offset-4"
               >
                 <Image src={logo} alt="TruePath" className="h-8 w-8" priority />
-                <span className="font-display text-lg font-bold tracking-tight text-gray-900 dark:text-white">TruePath</span>
+                <span className="font-display text-lg font-bold tracking-tight text-ink-deep dark:text-ink-soft">TruePath</span>
               </Link>
+
               <div className="flex items-center gap-3 sm:gap-5">
                 <Link
                   href="/paths"
-                  className="rounded-md px-2 py-1.5 font-body text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-ink-soft dark:hover:text-white"
+                  className="rounded-full px-3 py-1.5 font-body text-sm text-amber bg-amber/5 hover:bg-amber/10 transition-colors"
                 >
                   Paths
                 </Link>
-                <ThemeToggle />
-                <Link
-                  href="/login"
-                  className="rounded-lg border border-gray-200 bg-gray-100 px-3.5 py-2 font-body text-sm text-gray-700 backdrop-blur-md transition-colors hover:bg-gray-200 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+
+                <a
+                  href="https://discord.gg/pVkpAZSN"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm font-body text-amber hover:bg-amber/10 transition-colors"
                 >
-                  Log in
-                </Link>
+                  <Image src="/icons/disord.png" alt="Discord" width={18} height={18} className="rounded-sm" />
+                  <span className="hidden sm:inline">Discord</span>
+                </a>
+
+                <ThemeToggle />
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/signup"
+                    className="rounded-md bg-amber px-3 py-2 text-sm font-medium text-white hover:brightness-95 transition-colors"
+                  >
+                    Sign up
+                  </Link>
+
+                  <Link
+                    href="/login"
+                    className="rounded-lg border border-gray-200 bg-gray-100 px-3.5 py-2 font-body text-sm text-ink-deep dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                  >
+                    Log in
+                  </Link>
+                </div>
               </div>
             </nav>
           </header>
