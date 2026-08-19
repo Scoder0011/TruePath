@@ -8,15 +8,18 @@ if (!apiUrl) {
   throw new Error("Missing API_URL or NEXT_PUBLIC_API_URL environment variable");
 }
 
+const apiBaseUrl = apiUrl.replace(/\/+$/, "");
+
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${apiUrl}${path}`, {
+  const url = new URL(path.replace(/^\/+/, ""), `${apiBaseUrl}/`).toString();
+  const response = await fetch(url, {
     cache: "no-store",
     ...init,
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
     throw new Error(
-      `API request failed: ${response.status} ${response.statusText}${
+      `API request failed for ${url}: ${response.status} ${response.statusText}${
         detail ? ` — ${detail}` : ""
       }`,
     );
