@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 type PathOption = {
@@ -323,86 +322,81 @@ const CYBERSECURITY_TREE: TeamNode[] = [
   },
 ];
 
-const TEAM_STYLES: Record<string, { badge: string; chip: string }> = {
-  "red-team": { badge: "bg-red-500/10 text-red-200 border border-red-500/40", chip: "bg-red-500/10 text-red-200" },
-  "blue-team": { badge: "bg-route/10 text-route border border-route/40", chip: "bg-route/10 text-route" },
-  "purple-team": { badge: "bg-amber/10 text-amber border border-amber/40", chip: "bg-amber/10 text-amber" },
-};
-
-export default function PathDiscoveryPage({ params }: { params: { pathSlug: string } }) {
-  const router = useRouter();
+export default function PathsPage() {
+  const [activePathSlug, setActivePathSlug] = useState("cybersecurity");
   const [search, setSearch] = useState("");
   const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({
     "red-team": true,
     "blue-team": true,
     "purple-team": true,
   });
-  const [hoveredSpecId, setHoveredSpecId] = useState<string | null>(null);
+  const [hoveredSpec, setHoveredSpec] = useState<SpecializationItem | null>(null);
+  const [selectedSpec, setSelectedSpec] = useState<SpecializationItem | null>(null);
   const [hoveredTeamId, setHoveredTeamId] = useState<string | null>(null);
-  const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const normalizedPathSlug = PATHS.some((path) => path.slug === params.pathSlug) ? params.pathSlug : "cybersecurity";
-  const currentPath = PATHS.find((path) => path.slug === normalizedPathSlug) ?? PATHS[0];
+  const activePath = PATHS.find((path) => path.slug === activePathSlug) ?? PATHS[0];
+  const activeTree = activePathSlug === "cybersecurity" ? CYBERSECURITY_TREE : [];
 
   const filteredTeams = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return CYBERSECURITY_TREE.filter((team) => {
-      if (!query) return true;
-      return team.specializations.some((specialization) => specialization.label.toLowerCase().includes(query));
-    }).map((team) => ({
-      ...team,
-      visibleSpecializations: query
-        ? team.specializations.filter((specialization) => specialization.label.toLowerCase().includes(query))
-        : team.specializations,
-    }));
-  }, [search]);
+    return activeTree
+      .filter((team) => {
+        if (!query) return true;
+        return team.specializations.some((specialization) => specialization.label.toLowerCase().includes(query));
+      })
+      .map((team) => ({
+        ...team,
+        visibleSpecializations: query
+          ? team.specializations.filter((specialization) => specialization.label.toLowerCase().includes(query))
+          : team.specializations,
+      }));
+  }, [activeTree, search]);
 
-  const sidebarSpec = useMemo(() => {
-    const id = selectedSpecId ?? hoveredSpecId;
-    if (!id) return null;
-    return CYBERSECURITY_TREE.flatMap((team) => team.specializations).find((specialization) => specialization.id === id) ?? null;
-  }, [hoveredSpecId, selectedSpecId]);
-
-  const sidebarTeam = useMemo(() => {
-    if (sidebarSpec) return null;
+  const visibleSpec = hoveredSpec ?? selectedSpec;
+  const visibleTeam = useMemo(() => {
+    if (visibleSpec) return null;
     if (!hoveredTeamId) return null;
-    return CYBERSECURITY_TREE.find((team) => team.id === hoveredTeamId) ?? null;
-  }, [hoveredTeamId, sidebarSpec]);
+    return activeTree.find((team) => team.id === hoveredTeamId) ?? null;
+  }, [activeTree, hoveredTeamId, visibleSpec]);
+
+  const handlePathChange = (slug: string) => {
+    setActivePathSlug(slug);
+    setSelectedSpec(null);
+    setHoveredSpec(null);
+    setHoveredTeamId(null);
+    setSheetOpen(false);
+  };
 
   const handleSpecClick = (specialization: SpecializationItem) => {
-    setSelectedSpecId(specialization.id);
-    setHoveredSpecId(specialization.id);
+    setSelectedSpec(specialization);
+    setHoveredSpec(null);
     setSheetOpen(true);
-
-    if (specialization.status === "active") {
-      router.push(`/paths/${normalizedPathSlug}/${specialization.slug}`);
-    }
   };
 
   return (
     <main className="flex h-screen overflow-hidden bg-ink-deep">
-      <div className="flex h-full w-full flex-col lg:flex-row">
-        <aside className="border-b border-white/10 bg-ink-deep p-3 lg:h-full lg:w-[180px] lg:border-b-0 lg:border-r lg:p-4">
+      <div className="flex h-full w-full flex-row">
+        <aside className="border-r border-white/10 bg-ink-deep p-3 lg:w-[30%] lg:p-4">
           <div className="mb-4 lg:mb-6">
             <p className="font-mono text-[10px] tracking-[0.2em] text-amber">PATHS</p>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
             {PATHS.map((path) => {
-              const isCurrent = path.slug === normalizedPathSlug;
+              const isCurrent = path.slug === activePathSlug;
               const isActive = path.status === "active";
 
               return (
-                <Link
+                <button
                   key={path.slug}
-                  href={isActive ? `/paths/${path.slug}` : "#"}
-                  aria-disabled={!isActive}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={(event) => {
-                    if (!isActive) event.preventDefault();
+                  type="button"
+                  onClick={() => {
+                    if (!isActive) return;
+                    handlePathChange(path.slug);
                   }}
+                  disabled={!isActive}
                   className={[
                     "group shrink-0 rounded-xl border px-3 py-3 text-left transition-colors lg:w-full",
                     isCurrent
@@ -423,13 +417,20 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
                       Coming soon
                     </span>
                   )}
-                </Link>
+                </button>
               );
             })}
           </div>
         </aside>
 
-        <section className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-white/10 bg-ink-deep lg:border-r">
+        <section className="flex h-full min-h-0 flex-col overflow-hidden bg-ink-deep lg:w-[40%] lg:border-r lg:border-white/10">
+          <div className="border-b border-white/10 bg-ink-deep px-4 pb-3 pt-4 lg:px-6">
+            <div className="flex items-center gap-2">
+              <span aria-hidden="true" className="text-base">📂</span>
+              <p className="font-display text-sm font-semibold text-white">{activePath.title}</p>
+            </div>
+          </div>
+
           <div className="border-b border-white/10 bg-ink-deep px-4 py-4 lg:px-6">
             <input
               type="text"
@@ -444,12 +445,9 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
             <div className="space-y-4">
               {filteredTeams.map((team) => {
                 const isExpanded = expandedTeams[team.id] ?? true;
-                const teamStyle = TEAM_STYLES[team.id];
-
-                if (!isExpanded) return null;
 
                 return (
-                  <div key={team.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-2">
+                  <div key={team.id} className="ml-4 border-l border-white/10 pl-3">
                     <button
                       type="button"
                       onMouseEnter={() => setHoveredTeamId(team.id)}
@@ -461,9 +459,7 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-base" aria-hidden="true">{team.icon}</span>
-                        <div>
-                          <p className="font-display text-sm font-semibold text-white">{team.label}</p>
-                        </div>
+                        <p className="font-display text-sm font-semibold text-white">{team.label}</p>
                       </div>
 
                       <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
@@ -472,23 +468,23 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
                     </button>
 
                     {isExpanded && (
-                      <div className="mt-2 space-y-1 px-1 pb-1">
+                      <div className="mt-2 space-y-1 pb-1">
                         {team.visibleSpecializations.map((specialization) => {
-                          const isSelected = selectedSpecId === specialization.id;
-                          const isHovered = hoveredSpecId === specialization.id;
+                          const isSelected = selectedSpec?.id === specialization.id;
+                          const isHovered = hoveredSpec?.id === specialization.id;
                           const isActive = specialization.status === "active";
 
                           return (
                             <button
                               key={specialization.id}
                               type="button"
-                              onMouseEnter={() => setHoveredSpecId(specialization.id)}
-                              onMouseLeave={() => setHoveredSpecId((current) => (current === specialization.id ? null : current))}
-                              onFocus={() => setHoveredSpecId(specialization.id)}
-                              onBlur={() => setHoveredSpecId((current) => (current === specialization.id ? null : current))}
+                              onMouseEnter={() => setHoveredSpec(specialization)}
+                              onMouseLeave={() => setHoveredSpec(null)}
+                              onFocus={() => setHoveredSpec(specialization)}
+                              onBlur={() => setHoveredSpec((current) => (current?.id === specialization.id ? null : current))}
                               onClick={() => handleSpecClick(specialization)}
                               className={[
-                                "flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
+                                "ml-8 flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
                                 isSelected
                                   ? "border-l-2 border-amber bg-white/8"
                                   : isHovered
@@ -520,16 +516,6 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
                         })}
                       </div>
                     )}
-
-                    {teamStyle && !isExpanded && (
-                      <div className="mt-2 flex gap-2 px-2 pb-1">
-                        {team.specializations.map((specialization) => (
-                          <span key={specialization.id} className={["rounded-full px-2 py-1 text-[10px]", teamStyle.chip].join(" ")}>
-                            {specialization.label}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -545,7 +531,7 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
 
         <aside
           className={[
-            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-deep p-4 shadow-2xl shadow-ink-deep/60 transition-transform duration-200 lg:static lg:h-full lg:w-[300px] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
+            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-deep p-4 shadow-2xl shadow-ink-deep/60 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
             sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)] lg:translate-y-0",
           ].join(" ")}
         >
@@ -557,28 +543,31 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
           </div>
 
           <div className="h-full overflow-y-auto">
-            {!sidebarSpec && !sidebarTeam && (
+            {!visibleSpec && !visibleTeam && (
               <div className="flex min-h-[220px] items-center justify-center text-center">
                 <p className="max-w-xs font-body text-base text-ink-soft">Select a path to see details</p>
               </div>
             )}
 
-            {sidebarTeam && (
+            {visibleTeam && (
               <div className="space-y-5">
                 <div className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-amber">
-                  {sidebarTeam.id.replace("-", " ").toUpperCase()}
+                  {visibleTeam.id.replace("-", " ").toUpperCase()}
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-white">{sidebarTeam.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{sidebarTeam.description}</p>
+                  <h2 className="font-display text-xl font-bold text-white">{visibleTeam.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{visibleTeam.description}</p>
                 </div>
 
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Specializations</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {sidebarTeam.specializations.map((specialization) => (
-                      <span key={specialization.id} className="rounded-full border border-white/10 bg-white/5 px-2 py-1 font-body text-[11px] text-ink-soft">
+                    {visibleTeam.specializations.map((specialization) => (
+                      <span
+                        key={specialization.id}
+                        className="rounded-full border border-white/10 bg-white/5 px-2 py-1 font-body text-[11px] text-ink-soft"
+                      >
                         {specialization.label}
                       </span>
                     ))}
@@ -587,30 +576,33 @@ export default function PathDiscoveryPage({ params }: { params: { pathSlug: stri
               </div>
             )}
 
-            {sidebarSpec && (
+            {visibleSpec && (
               <div className="space-y-5">
                 <div className="inline-flex items-center rounded-full border border-amber/40 bg-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-amber">
-                  {CYBERSECURITY_TREE.find((team) => team.specializations.some((specialization) => specialization.id === sidebarSpec.id))?.id.replace("-", " ").toUpperCase() ?? "PATH"}
+                  {activeTree
+                    .find((team) => team.specializations.some((specialization) => specialization.id === visibleSpec.id))
+                    ?.id.replace("-", " ")
+                    .toUpperCase() ?? "PATH"}
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-white">{sidebarSpec.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.description}</p>
+                  <h2 className="font-display text-xl font-bold text-white">{visibleSpec.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{visibleSpec.description}</p>
                 </div>
 
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">WHO IT&apos;S FOR:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.whoFor}</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{visibleSpec.whoFor}</p>
                 </div>
 
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{sidebarSpec.duration}</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{visibleSpec.duration}</p>
                 </div>
 
-                {sidebarSpec.status === "active" ? (
+                {visibleSpec.status === "active" ? (
                   <Link
-                    href={`/paths/${normalizedPathSlug}/${sidebarSpec.slug}`}
+                    href={`/paths/${activePath.slug}/${visibleSpec.slug}`}
                     className="inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
                   >
                     Start this path <span aria-hidden="true">→</span>
