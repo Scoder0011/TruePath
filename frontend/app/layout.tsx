@@ -43,10 +43,11 @@ export default function RootLayout({
                   href="https://discord.gg/pVkpAZSN"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm font-body text-amber hover:bg-amber/10 transition-colors"
+                  aria-label="Join our Discord"
+                  title="Join our Discord"
+                  className="inline-flex items-center rounded-md p-1 text-sm font-body text-amber hover:bg-amber/10 transition-colors"
                 >
-                  <Image src="/icons/discord.png" alt="Discord" width={18} height={18} className="rounded-sm" />
-                  <span className="hidden sm:inline">Discord</span>
+                  <Image src="/icons/discord.png" alt="Discord" width={20} height={20} className="rounded-sm" />
                 </a>
 
                 <ThemeToggle />
