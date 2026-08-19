@@ -71,3 +71,11 @@ AFTER DOING ONE OF THE PATHS OR BOTH YOU CAN DO BUGBOUNTY -->
 --> TYPE (READING) https://academy.hackthebox.com/course/preview/introduction-to-active-directory
 --> TYPE (VIDEO) https://www.youtube.com/watch?v=yK1uBHPdp30
 --> TYPE (PRACTICE)https://orange-cyberdefense.github.io/GOAD/
+
+
+
+
+
+========================
+2-> 
+========================
