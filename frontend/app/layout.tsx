@@ -45,7 +45,7 @@ export default function RootLayout({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm font-body text-amber hover:bg-amber/10 transition-colors"
                 >
-                  <Image src="/icons/disord.png" alt="Discord" width={18} height={18} className="rounded-sm" />
+                  <Image src="/icons/discord.png" alt="Discord" width={18} height={18} className="rounded-sm" />
                   <span className="hidden sm:inline">Discord</span>
                 </a>
 
