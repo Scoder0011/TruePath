@@ -28,7 +28,7 @@ export default function Page() {
         </p>
 
         <h2>Data deletion</h2>
-        <p>Email us to delete your account and all associated data.</p>
+        <p>Join our Discord From Contacts and msg us to delete your account and all associated data.</p>
       </div>
     </main>
   );
