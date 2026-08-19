@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -18,9 +19,9 @@ const config: Config = {
         route: "#4FA97F",      // "complete" accent
       },
       fontFamily: {
-        display: ["var(--font-space-grotesk)", "sans-serif"],
-        body: ["var(--font-inter)", "sans-serif"],
-        mono: ["var(--font-plex-mono)", "monospace"],
+        display: ["Segoe UI", "Arial", "sans-serif"],
+        body: ["Inter", "Segoe UI", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
     },
   },

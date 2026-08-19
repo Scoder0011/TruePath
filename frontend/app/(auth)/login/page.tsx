@@ -8,7 +8,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import OAuthButtons from "@/components/auth/OAuthButtons";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/60 backdrop-blur-md outline-none transition-colors focus:border-amber";
+  "w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 backdrop-blur-md outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/60";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,14 +40,14 @@ export default function LoginPage() {
         <OAuthButtons />
 
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-white/10" />
-          <span className="font-mono text-[10px] tracking-[0.15em] text-ink-soft">OR</span>
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
+          <span className="font-mono text-[10px] tracking-[0.15em] text-gray-500 dark:text-ink-soft">OR</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1.5 block font-body text-xs text-ink-soft">
+            <label htmlFor="email" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
               Email
             </label>
             <input
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <label htmlFor="password" className="font-body text-xs text-ink-soft">
+              <label htmlFor="password" className="font-body text-xs text-gray-600 dark:text-ink-soft">
                 Password
               </label>
               <Link href="/forgot-password" className="font-body text-xs text-amber hover:opacity-80">
@@ -92,7 +92,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center font-body text-sm text-ink-soft">
+        <p className="text-center font-body text-sm text-gray-600 dark:text-ink-soft">
           Don&apos;t have an account?{" "}
           <Link href="/signup" className="text-amber hover:opacity-80">
             Sign up

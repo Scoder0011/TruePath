@@ -7,7 +7,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import OAuthButtons from "@/components/auth/OAuthButtons";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/60 backdrop-blur-md outline-none transition-colors focus:border-amber";
+  "w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 backdrop-blur-md outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/60";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -41,8 +41,8 @@ export default function SignupPage() {
   if (submitted) {
     return (
       <AuthCard title="Check your email" subtitle="">
-        <p className="font-body text-sm leading-relaxed text-ink-soft">
-          We sent a confirmation link to <span className="text-white">{email}</span>. Click it
+        <p className="font-body text-sm leading-relaxed text-gray-600 dark:text-ink-soft">
+          We sent a confirmation link to <span className="text-gray-900 dark:text-white">{email}</span>. Click it
           to activate your account, then log in.
         </p>
         <Link
@@ -61,14 +61,14 @@ export default function SignupPage() {
         <OAuthButtons />
 
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-white/10" />
-          <span className="font-mono text-[10px] tracking-[0.15em] text-ink-soft">OR</span>
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
+          <span className="font-mono text-[10px] tracking-[0.15em] text-gray-500 dark:text-ink-soft">OR</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-white/10" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1.5 block font-body text-xs text-ink-soft">
+            <label htmlFor="email" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
               Email
             </label>
             <input
@@ -83,7 +83,7 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1.5 block font-body text-xs text-ink-soft">
+            <label htmlFor="password" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
               Password
             </label>
             <input
@@ -109,7 +109,7 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="text-center font-body text-sm text-ink-soft">
+        <p className="text-center font-body text-sm text-gray-600 dark:text-ink-soft">
           Already have an account?{" "}
           <Link href="/login" className="text-amber hover:opacity-80">
             Log in

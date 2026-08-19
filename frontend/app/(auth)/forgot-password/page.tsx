@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import AuthCard from "@/components/auth/AuthCard";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/60 backdrop-blur-md outline-none transition-colors focus:border-amber";
+  "w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 backdrop-blur-md outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/60";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -35,8 +35,8 @@ export default function ForgotPasswordPage() {
   if (submitted) {
     return (
       <AuthCard title="Check your email" subtitle="">
-        <p className="font-body text-sm leading-relaxed text-ink-soft">
-          If an account exists for <span className="text-white">{email}</span>, we sent a link to
+        <p className="font-body text-sm leading-relaxed text-gray-600 dark:text-ink-soft">
+          If an account exists for <span className="text-gray-900 dark:text-white">{email}</span>, we sent a link to
           reset your password.
         </p>
         <Link
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
     <AuthCard title="Reset your password" subtitle="We'll email you a link to set a new one.">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1.5 block font-body text-xs text-ink-soft">
+          <label htmlFor="email" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
             Email
           </label>
           <input
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center font-body text-sm text-ink-soft">
+      <p className="mt-6 text-center font-body text-sm text-gray-600 dark:text-ink-soft">
         Remembered it?{" "}
         <Link href="/login" className="text-amber hover:opacity-80">
           Log in

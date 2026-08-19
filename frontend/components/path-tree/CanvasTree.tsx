@@ -14,9 +14,9 @@ type Edge = { x1: number; y1: number; x2: number; y2: number };
 const kindColor: Record<TreeNode["kind"], string> = {
   path: "border-amber text-amber",
   specialization: "border-route text-route",
-  stage: "border-white/20 text-white",
-  topic: "border-white/10 text-ink-soft",
-  resource: "border-white/5 text-ink-soft",
+  stage: "border-gray-300 text-gray-800 dark:border-white/20 dark:text-white",
+  topic: "border-gray-200 text-gray-700 dark:border-white/10 dark:text-ink-soft",
+  resource: "border-gray-200 text-gray-600 dark:border-white/5 dark:text-ink-soft",
 };
 
 // Recursively computes {x, y} for every visible node (respecting which
@@ -164,19 +164,19 @@ export default function CanvasTree({
   }, [positions]);
 
   return (
-    <div className="relative h-full w-full overflow-hidden border border-white/10 bg-ink-deep/60 backdrop-blur-xl">
+    <div className="relative h-full w-full overflow-hidden border border-gray-200 bg-gray-50/80 backdrop-blur-xl dark:border-white/10 dark:bg-ink-deep/60">
       {/* Zoom controls */}
-      <div className="absolute right-4 top-4 z-10 flex flex-col gap-1 rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
+      <div className="absolute right-4 top-4 z-10 flex flex-col gap-1 rounded-xl border border-gray-200 bg-white/80 p-1 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
         <button
           onClick={() => setZoom((z) => Math.min(1.6, z + 0.15))}
-          className="h-8 w-8 rounded-lg font-mono text-sm text-white hover:bg-white/10"
+          className="h-8 w-8 rounded-lg font-mono text-sm text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
           aria-label="Zoom in"
         >
           +
         </button>
         <button
           onClick={() => setZoom((z) => Math.max(0.5, z - 0.15))}
-          className="h-8 w-8 rounded-lg font-mono text-sm text-white hover:bg-white/10"
+          className="h-8 w-8 rounded-lg font-mono text-sm text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
           aria-label="Zoom out"
         >
           −
@@ -186,14 +186,14 @@ export default function CanvasTree({
             setZoom(1);
             setPan({ x: 40, y: 40 });
           }}
-          className="h-8 w-8 rounded-lg font-mono text-[10px] text-white hover:bg-white/10"
+          className="h-8 w-8 rounded-lg font-mono text-[10px] text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
           aria-label="Reset view"
         >
           ⟲
         </button>
       </div>
 
-      <p className="pointer-events-none absolute bottom-4 left-4 z-10 font-mono text-xs text-ink-soft">
+      <p className="pointer-events-none absolute bottom-4 left-4 z-10 font-mono text-xs text-gray-600 dark:text-ink-soft">
         DRAG TO PAN · SCROLL TO ZOOM · CLICK A NODE TO EXPAND
       </p>
 
@@ -223,7 +223,7 @@ export default function CanvasTree({
               <path
                 key={i}
                 d={`M ${edge.x1} ${edge.y1} C ${edge.x1 + 60} ${edge.y1}, ${edge.x2 - 60} ${edge.y2}, ${edge.x2} ${edge.y2}`}
-                stroke="rgba(255,255,255,0.12)"
+                stroke="rgba(100,116,139,0.35)"
                 strokeWidth={1.5}
                 fill="none"
               />
@@ -248,7 +248,7 @@ export default function CanvasTree({
                     rel="noreferrer"
                     onMouseEnter={() => onNodeHover?.(node)}
                     onMouseLeave={() => onNodeHover?.(null)}
-                    className={`flex h-11 items-center justify-between rounded-lg border bg-white/5 px-3 font-body text-sm text-white backdrop-blur-md transition-colors hover:border-route ${kindColor[node.kind]} ${
+                    className={`flex h-11 items-center justify-between rounded-lg border bg-white/80 px-3 font-body text-sm text-gray-900 backdrop-blur-md transition-colors hover:border-route dark:bg-white/5 dark:text-white ${kindColor[node.kind]} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
                   >
@@ -260,13 +260,13 @@ export default function CanvasTree({
                     onClick={() => toggle(node)}
                     onMouseEnter={() => onNodeHover?.(node)}
                     onMouseLeave={() => onNodeHover?.(null)}
-                    className={`flex h-11 w-full items-center justify-between rounded-lg border bg-white/5 px-3 text-left font-body text-sm text-white backdrop-blur-md transition-colors hover:border-amber ${kindColor[node.kind]} ${
+                    className={`flex h-11 w-full items-center justify-between rounded-lg border bg-white/80 px-3 text-left font-body text-sm text-gray-900 backdrop-blur-md transition-colors hover:border-amber dark:bg-white/5 dark:text-white ${kindColor[node.kind]} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
                   >
                     <span className="truncate">{node.label}</span>
                     {!isLeaf && (
-                      <span className="ml-2 shrink-0 font-mono text-xs text-ink-soft">
+                      <span className="ml-2 shrink-0 font-mono text-xs text-gray-500 dark:text-ink-soft">
                         {isOpen ? "−" : "+"}
                       </span>
                     )}

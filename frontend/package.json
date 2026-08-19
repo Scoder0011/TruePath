@@ -8,9 +8,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.4",
+    "@supabase/ssr": "file:./vendor/@supabase/ssr",
     "@supabase/supabase-js": "^2.112.3",
     "next": "14.2.0",
+    "next-themes": "file:./vendor/next-themes",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },

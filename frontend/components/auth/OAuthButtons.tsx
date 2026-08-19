@@ -28,7 +28,7 @@ export default function OAuthButtons() {
         type="button"
         onClick={() => handleOAuth("google")}
         disabled={loadingProvider !== null}
-        className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white backdrop-blur-md transition-colors hover:bg-white/10 disabled:opacity-50"
+        className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 font-body text-sm text-gray-700 backdrop-blur-md transition-colors hover:bg-gray-200 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
       >
         <GoogleIcon />
         {loadingProvider === "google" ? "Redirecting…" : "Google"}
@@ -37,7 +37,7 @@ export default function OAuthButtons() {
         type="button"
         onClick={() => handleOAuth("github")}
         disabled={loadingProvider !== null}
-        className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white backdrop-blur-md transition-colors hover:bg-white/10 disabled:opacity-50"
+        className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 font-body text-sm text-gray-700 backdrop-blur-md transition-colors hover:bg-gray-200 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
       >
         <GitHubIcon />
         {loadingProvider === "github" ? "Redirecting…" : "GitHub"}

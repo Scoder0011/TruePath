@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import AuthCard from "@/components/auth/AuthCard";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/60 backdrop-blur-md outline-none transition-colors focus:border-amber";
+  "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 backdrop-blur-md outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/60";
 
 // Reached only via the /auth/callback redirect after clicking the email
 // link — by the time this page renders, the callback route has already
@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
     <AuthCard title="Set a new password" subtitle="Make it something you'll remember this time.">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="password" className="mb-1.5 block font-body text-xs text-ink-soft">
+          <label htmlFor="password" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
             New password
           </label>
           <input
@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <div>
-          <label htmlFor="confirm" className="mb-1.5 block font-body text-xs text-ink-soft">
+          <label htmlFor="confirm" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
             Confirm password
           </label>
           <input
