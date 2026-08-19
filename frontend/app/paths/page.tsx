@@ -378,7 +378,7 @@ export default function PathsPage() {
   return (
     <main className="flex h-screen overflow-hidden bg-ink-deep">
       <div className="flex h-full w-full flex-row">
-        <aside className="border-r border-white/10 bg-ink-deep p-3 lg:w-[30%] lg:p-4">
+        <aside className="border-r border-white/10 bg-ink-deep p-3 lg:w-[18%] lg:p-4">
           <div className="mb-4 lg:mb-6">
             <p className="font-mono text-[10px] tracking-[0.2em] text-amber">PATHS</p>
           </div>
@@ -398,36 +398,30 @@ export default function PathsPage() {
                   }}
                   disabled={!isActive}
                   className={[
-                    "group shrink-0 rounded-xl border px-3 py-3 text-left transition-colors lg:w-full",
-                    isCurrent
-                      ? "border-amber/80 bg-white/8 text-white"
-                      : isActive
-                        ? "border-white/10 bg-white/5 text-ink-soft hover:bg-white/8 hover:text-white"
-                        : "cursor-not-allowed border-white/5 bg-white/[0.03] text-ink-soft/70",
-                    "border-l-2",
-                    isCurrent ? "border-l-amber" : "border-l-transparent",
+                    "w-full shrink-0 rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/5",
+                    isCurrent ? "border-l-2 border-amber bg-white/5 text-white" : "text-ink-soft",
+                    !isActive && "cursor-not-allowed opacity-60",
                   ].join(" ")}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-body text-sm font-medium text-current">{path.title}</span>
-                    {isCurrent && <span className="h-2 w-2 rounded-full bg-amber" aria-hidden="true" />}
-                  </div>
-                  {!isActive && (
-                    <span className="mt-2 block font-mono text-[9px] uppercase tracking-[0.16em] text-ink-soft">
-                      Coming soon
+                  <div className="flex flex-col gap-1">
+                    <span className={isCurrent ? "font-body text-sm font-medium text-white" : "font-body text-sm text-ink-soft"}>
+                      {path.title}
                     </span>
-                  )}
+                    <span className={isActive ? "text-[10px] text-route" : "text-[10px] text-ink-soft"}>
+                      {isActive ? "● Active" : "● Coming Soon"}
+                    </span>
+                  </div>
                 </button>
               );
             })}
           </div>
         </aside>
 
-        <section className="flex h-full min-h-0 flex-col overflow-hidden bg-ink-deep lg:w-[40%] lg:border-r lg:border-white/10">
+        <section className="flex h-full min-h-0 flex-col overflow-hidden bg-ink-deep lg:w-[52%] lg:border-r lg:border-white/10">
           <div className="border-b border-white/10 bg-ink-deep px-4 pb-3 pt-4 lg:px-6">
             <div className="flex items-center gap-2">
               <span aria-hidden="true" className="text-base">📂</span>
-              <p className="font-display text-sm font-semibold text-white">{activePath.title}</p>
+              <p className="font-display text-base font-semibold text-white">{activePath.title}</p>
             </div>
           </div>
 
@@ -437,7 +431,7 @@ export default function PathsPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search paths..."
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/70 outline-none transition-colors focus:border-amber"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft/50 outline-none transition-colors focus:border-amber/50"
             />
           </div>
 
@@ -447,75 +441,81 @@ export default function PathsPage() {
                 const isExpanded = expandedTeams[team.id] ?? true;
 
                 return (
-                  <div key={team.id} className="ml-4 border-l border-white/10 pl-3">
-                    <button
-                      type="button"
-                      onMouseEnter={() => setHoveredTeamId(team.id)}
-                      onMouseLeave={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
-                      onFocus={() => setHoveredTeamId(team.id)}
-                      onBlur={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
-                      onClick={() => setExpandedTeams((current) => ({ ...current, [team.id]: !(current[team.id] ?? true) }))}
-                      className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-white/5"
+                  <div key={team.id} className="relative pl-3">
+                    <div className="absolute inset-y-0 left-0 w-px bg-white/15" aria-hidden="true" />
+
+                    <div className="flex items-center gap-2 py-2 pl-2">
+                      <span className="font-mono text-[10px] text-ink-soft">─</span>
+                      <button
+                        type="button"
+                        onMouseEnter={() => setHoveredTeamId(team.id)}
+                        onMouseLeave={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
+                        onFocus={() => setHoveredTeamId(team.id)}
+                        onBlur={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
+                        onClick={() => setExpandedTeams((current) => ({ ...current, [team.id]: !(current[team.id] ?? true) }))}
+                        className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-left transition-colors hover:bg-white/5"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-base" aria-hidden="true">{team.icon}</span>
+                          <p className="font-body text-sm font-medium text-white">{team.label}</p>
+                        </div>
+
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
+                          {isExpanded ? "−" : "+"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div
+                      className={[
+                        "overflow-hidden transition-all duration-300 ease-in-out",
+                        isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0",
+                      ].join(" ")}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-base" aria-hidden="true">{team.icon}</span>
-                        <p className="font-display text-sm font-semibold text-white">{team.label}</p>
-                      </div>
+                      <div className="ml-4 border-l border-white/10 pl-3">
+                        <div className="space-y-1 pb-2 pt-1">
+                          {team.visibleSpecializations.map((specialization) => {
+                            const isSelected = selectedSpec?.id === specialization.id;
+                            const isHovered = hoveredSpec?.id === specialization.id;
+                            const isActive = specialization.status === "active";
 
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft">
-                        {isExpanded ? "−" : "+"}
-                      </span>
-                    </button>
-
-                    {isExpanded && (
-                      <div className="mt-2 space-y-1 pb-1">
-                        {team.visibleSpecializations.map((specialization) => {
-                          const isSelected = selectedSpec?.id === specialization.id;
-                          const isHovered = hoveredSpec?.id === specialization.id;
-                          const isActive = specialization.status === "active";
-
-                          return (
-                            <button
-                              key={specialization.id}
-                              type="button"
-                              onMouseEnter={() => setHoveredSpec(specialization)}
-                              onMouseLeave={() => setHoveredSpec(null)}
-                              onFocus={() => setHoveredSpec(specialization)}
-                              onBlur={() => setHoveredSpec((current) => (current?.id === specialization.id ? null : current))}
-                              onClick={() => handleSpecClick(specialization)}
-                              className={[
-                                "ml-8 flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
-                                isSelected
-                                  ? "border-l-2 border-amber bg-white/8"
-                                  : isHovered
-                                    ? "bg-white/5"
-                                    : "border-white/0 bg-transparent hover:bg-white/5",
-                              ].join(" ")}
-                            >
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate font-body text-sm text-white">{specialization.label}</p>
-                              </div>
-
-                              <span
+                            return (
+                              <button
+                                key={specialization.id}
+                                type="button"
+                                onMouseEnter={() => setHoveredSpec(specialization)}
+                                onMouseLeave={() => setHoveredSpec(null)}
+                                onFocus={() => setHoveredSpec(specialization)}
+                                onBlur={() => setHoveredSpec((current) => (current?.id === specialization.id ? null : current))}
+                                onClick={() => handleSpecClick(specialization)}
                                 className={[
-                                  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium",
-                                  isActive ? "bg-route/10 text-route" : "bg-white/5 text-ink-soft",
+                                  "flex w-full items-center justify-between gap-3 rounded-lg border-l px-3 py-2 text-left transition-all duration-200",
+                                  isSelected
+                                    ? "border-l-2 border-amber bg-white/8 text-white"
+                                    : isHovered
+                                      ? "bg-white/5 text-white"
+                                      : "border-l border-transparent bg-transparent text-ink-soft hover:bg-white/5 hover:text-white",
                                 ].join(" ")}
                               >
+                                <div className="flex min-w-0 items-center gap-2">
+                                  <span className="font-mono text-[10px] text-ink-soft">├─</span>
+                                  <span className="truncate font-body text-sm">{specialization.label}</span>
+                                </div>
+
                                 <span
                                   className={[
-                                    "inline-block h-1.5 w-1.5 rounded-full",
-                                    isActive ? "bg-route" : "bg-ink-soft",
+                                    "whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                    isActive ? "bg-route/10 text-route" : "bg-white/5 text-ink-soft",
                                   ].join(" ")}
-                                  aria-hidden="true"
-                                />
-                                {isActive ? "Active" : "Soon"}
-                              </span>
-                            </button>
-                          );
-                        })}
+                                >
+                                  {isActive ? "● Active" : "○ Soon"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               })}
@@ -544,8 +544,12 @@ export default function PathsPage() {
 
           <div className="h-full overflow-y-auto">
             {!visibleSpec && !visibleTeam && (
-              <div className="flex min-h-[220px] items-center justify-center text-center">
-                <p className="max-w-xs font-body text-base text-ink-soft">Select a path to see details</p>
+              <div className="flex min-h-[220px] flex-col justify-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-5">
+                <h2 className="font-display text-lg text-white">Explore a path</h2>
+                <p className="font-body text-sm text-ink-soft">Hover to preview, click to lock the details here.</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-route/20 bg-route/10 px-3 py-1 text-xs text-route">Penetration Testing</span>
+                </div>
               </div>
             )}
 
