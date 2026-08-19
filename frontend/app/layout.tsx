@@ -28,7 +28,7 @@ export default function RootLayout({
                 className="flex items-center gap-2.5 rounded-md focus-visible:outline-offset-4"
               >
                 <Image src={logo} alt="TruePath" className="h-8 w-8" priority />
-                <span className="font-display text-lg font-bold tracking-tight text-ink-deep dark:text-ink-soft">₮ⱤɄɆ₱₳₮Ⱨ</span>
+                <span className="font-display text-lg font-bold tracking-tight text-ink-deep dark:text-ink-soft">𝕋ℝ𝕌𝔼ℙ𝔸𝕋ℍ</span>
               </Link>
 
               <div className="flex items-center gap-3 sm:gap-5">
