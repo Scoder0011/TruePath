@@ -4,13 +4,134 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import CanvasTree from "@/components/path-tree/CanvasTree";
 import { getPath } from "@/lib/api/client";
-import { pathToTree, type Path, type Specialization } from "@/lib/types/path-tree";
+import { pathToTree, type Path, type TreeNode } from "@/lib/types/path-tree";
+
+type SidebarCard = {
+  title: string;
+  description?: string | null;
+  prerequisites?: string | null;
+  duration?: string | null;
+  career_outcomes?: string | null;
+  resources?: Array<{
+    title: string;
+    url: string | null;
+    type: string;
+    isFree: boolean;
+  }>;
+  kind?: "path" | "specialization" | "stage" | "topic" | "resource";
+  typeLabel?: string;
+  url?: string | null;
+};
+
+function getDefaultPathInfo(pathData: Path): SidebarCard {
+  const primarySpec =
+    pathData.specializations.find(
+      (specialization) => (specialization.stages ?? []).some((stage) => (stage.topics ?? []).length > 0),
+    ) ?? pathData.specializations[0];
+
+  return {
+    title: pathData.title,
+    description: pathData.description ?? "",
+    prerequisites: primarySpec?.prerequisites ?? "No formal prerequisites listed yet.",
+    duration: primarySpec?.duration ?? "Flexible",
+    career_outcomes: primarySpec?.career_outcomes ?? "Career outcomes will be added soon.",
+    kind: "path",
+  };
+}
+
+function getNodeDetail(node: TreeNode, pathData: Path): SidebarCard | null {
+  if (node.kind === "path") {
+    return {
+      title: pathData.title,
+      description: pathData.description ?? "",
+      kind: "path",
+    };
+  }
+
+  if (node.kind === "specialization") {
+    const specialization = pathData.specializations.find((item) => item.id === node.id);
+    if (!specialization) return null;
+
+    return {
+      title: specialization.title,
+      description: specialization.description ?? "",
+      prerequisites: specialization.prerequisites ?? "No formal prerequisites listed yet.",
+      duration: specialization.duration ?? "Flexible",
+      career_outcomes: specialization.career_outcomes ?? "Career outcomes will be added soon.",
+      kind: "specialization",
+    };
+  }
+
+  if (node.kind === "stage") {
+    const stage = pathData.specializations
+      .flatMap((specialization) => specialization.stages ?? [])
+      .find((item) => item.id === node.id);
+
+    if (!stage) return null;
+
+    return {
+      title: stage.title,
+      description: stage.description ?? "No stage overview yet.",
+      kind: "stage",
+    };
+  }
+
+  if (node.kind === "topic") {
+    const topic = pathData.specializations
+      .flatMap((specialization) => specialization.stages ?? [])
+      .flatMap((stage) => stage.topics ?? [])
+      .find((item) => item.id === node.id);
+
+    if (!topic) return null;
+
+    return {
+      title: topic.title,
+      description: topic.description ?? "No topic summary yet.",
+      resources: (topic.resources ?? []).map((resource) => ({
+        title: resource.title ?? resource.type,
+        url: resource.url ?? null,
+        type: resource.type,
+        isFree: Boolean(resource.is_free),
+      })),
+      kind: "topic",
+    };
+  }
+
+  if (node.kind === "resource") {
+    const resource = pathData.specializations
+      .flatMap((specialization) => specialization.stages ?? [])
+      .flatMap((stage) => stage.topics ?? [])
+      .flatMap((topic) => topic.resources ?? [])
+      .find((item) => item.id === node.id);
+
+    if (!resource) return null;
+
+    return {
+      title: resource.title ?? resource.type,
+      description: resource.type,
+      kind: "resource",
+      typeLabel: resource.type,
+      url: resource.url ?? null,
+      resources: [
+        {
+          title: resource.title ?? resource.type,
+          url: resource.url ?? null,
+          type: resource.type,
+          isFree: Boolean(resource.is_free),
+        },
+      ],
+    };
+  }
+
+  return null;
+}
 
 export default function PathDetailPage({ params }: { params: { pathSlug: string } }) {
   const [path, setPath] = useState<Path | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [hoveredNode, setHoveredNode] = useState<TreeNode | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,7 +147,7 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
       .catch((err: unknown) => {
         if (cancelled) return;
         console.error(`Failed to load path "${params.pathSlug}"`, err);
-        setError(`Couldn't load this path right now. Please try again in a moment.`);
+        setError("Couldn't load this path right now. Please try again in a moment.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -37,38 +158,173 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
     };
   }, [params.pathSlug]);
 
-  const primarySpecialization = useMemo<Specialization | null>(() => {
-    if (!path?.specializations?.length) return null;
-    return path.specializations.find((specialization) => specialization.stages?.length > 0) ?? path.specializations[0];
-  }, [path]);
+  const defaultInfo = useMemo(() => (path ? getDefaultPathInfo(path) : null), [path]);
+  const currentInfo = useMemo(() => {
+    if (!path) return defaultInfo;
+    if (!hoveredNode) return defaultInfo;
+    return getNodeDetail(hoveredNode, path) ?? defaultInfo;
+  }, [defaultInfo, hoveredNode, path]);
 
-  const tree = useMemo(() => {
-    if (!path) return null;
-    return pathToTree(path);
-  }, [path]);
+  const renderContent = (info: SidebarCard | null) => {
+    if (!info) {
+      return <p className="font-body text-sm text-ink-soft">No details available for this node.</p>;
+    }
+
+    return (
+      <div className="space-y-5">
+        {info.kind !== "topic" && info.kind !== "resource" && (
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+              {info.kind === "path" ? "OVERVIEW" : info.kind === "specialization" ? "DESCRIPTION" : "STAGE"}
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
+            {info.description && (
+              <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{info.description}</p>
+            )}
+          </div>
+        )}
+
+        {info.kind === "topic" && (
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">TOPIC</p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
+            {info.description && <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{info.description}</p>}
+          </div>
+        )}
+
+        {info.kind === "resource" && (
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCE</p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-white">{info.title}</h2>
+            {info.typeLabel && (
+              <div className="mt-3 flex items-center gap-2">
+                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
+                  {info.typeLabel}
+                </span>
+                <span
+                  className={[
+                    "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
+                    info.resources?.[0]?.isFree
+                      ? "bg-route/10 text-route"
+                      : "border border-white/10 bg-white/5 text-ink-soft",
+                  ].join(" ")}
+                >
+                  {info.resources?.[0]?.isFree ? "Free" : "Paid"}
+                </span>
+              </div>
+            )}
+            {info.url && (
+              <a
+                href={info.url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
+              >
+                Open resource <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </div>
+        )}
+
+        {info.kind !== "resource" && info.kind !== "topic" && (
+          <>
+            {info.prerequisites && (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">PREREQUISITES</p>
+                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.prerequisites}</p>
+              </div>
+            )}
+
+            {info.duration && (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION</p>
+                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.duration}</p>
+              </div>
+            )}
+
+            {info.career_outcomes && (
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER OUTCOMES</p>
+                <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{info.career_outcomes}</p>
+              </div>
+            )}
+          </>
+        )}
+
+        {info.kind === "topic" && info.resources && info.resources.length > 0 && (
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCES</p>
+            <div className="mt-3 space-y-3">
+              {info.resources.map((resource) => (
+                <a
+                  key={`${resource.title}-${resource.type}-${resource.url ?? "local"}`}
+                  href={resource.url ?? undefined}
+                  target={resource.url ? "_blank" : undefined}
+                  rel={resource.url ? "noreferrer" : undefined}
+                  className="block rounded-xl border border-white/10 bg-white/5 p-3 text-left transition-colors hover:border-amber/70"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-body text-sm text-white">{resource.title}</span>
+                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
+                      {resource.type}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
+                      {resource.url ? "Open" : "No link"}
+                    </span>
+                    <span
+                      className={[
+                        "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
+                        resource.isFree ? "bg-route/10 text-route" : "bg-white/5 text-ink-soft",
+                      ].join(" ")}
+                    >
+                      {resource.isFree ? "Free" : "Paid"}
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <main className="relative isolate min-h-screen overflow-hidden bg-ink-deep px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-      <div
-        aria-hidden="true"
-        className="absolute -left-28 top-0 -z-10 h-72 w-72 rounded-full bg-amber/20 blur-3xl sm:h-96 sm:w-96"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -right-24 top-40 -z-10 h-80 w-80 rounded-full bg-route/20 blur-3xl sm:h-[30rem] sm:w-[30rem]"
-      />
+    <main className="h-screen overflow-hidden bg-ink-deep">
+      <div className="relative flex h-screen flex-col md:flex-row">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((current) => !current)}
+          className="absolute left-4 top-4 z-20 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft md:hidden"
+        >
+          {sidebarOpen ? "Hide info" : "Path info"}
+        </button>
 
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER PATH</p>
-          <h1 className="mt-2 font-display text-3xl text-white md:text-5xl">
-            {path?.title ?? "Loading..."}
-          </h1>
-        </div>
+        <aside
+          className={[
+            "z-10 h-full w-full border-r border-white/10 bg-white/5 backdrop-blur-xl md:w-[280px] md:shrink-0",
+            sidebarOpen ? "absolute inset-y-0 left-0 flex" : "hidden md:flex",
+          ].join(" ")}
+        >
+          <div className="flex min-h-0 w-full flex-col">
+            <div className="px-4 pb-3 pt-4">
+              <Link href="/paths" className="font-mono text-xs text-ink-soft transition-opacity hover:opacity-80">
+                ← Back to all paths
+              </Link>
 
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="lg:w-[30%]">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-ink-deep/30 backdrop-blur-xl">
+              <div className="mt-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER PATH</p>
+                <h1 className="mt-2 font-display text-2xl font-bold text-white">
+                  {path?.title ?? "Loading..."}
+                </h1>
+              </div>
+
+              <div className="mt-4 border-t border-white/10" />
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 pb-6">
               {loading && (
                 <div className="flex min-h-[220px] items-center justify-center">
                   <p className="font-mono text-sm text-ink-soft">Loading path details…</p>
@@ -81,73 +337,27 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
                 </div>
               )}
 
-              {!loading && !error && path && primarySpecialization && (
-                <>
-                  <Link
-                    href="/paths"
-                    className="inline-flex items-center gap-2 font-body text-sm text-amber transition-opacity hover:opacity-80"
-                  >
-                    <span aria-hidden="true">←</span> Back to all paths
-                  </Link>
-
-                  <div className="mt-6 space-y-5">
-                    <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Overview</p>
-                      <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{path.description}</p>
-                    </div>
-
-                    <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Prerequisites</p>
-                      <p className="mt-3 font-body text-sm leading-6 text-ink-soft">
-                        {primarySpecialization.prerequisites || "No formal prerequisites listed yet."}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Duration</p>
-                      <p className="mt-3 font-body text-sm leading-6 text-ink-soft">
-                        {primarySpecialization.duration || "Flexible"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Career outcomes</p>
-                      <p className="mt-3 font-body text-sm leading-6 text-ink-soft">
-                        {primarySpecialization.career_outcomes || "Career outcomes will be added soon."}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
+              {!loading && !error && currentInfo && renderContent(currentInfo)}
             </div>
-          </aside>
+          </div>
+        </aside>
 
-          <section className="lg:w-[70%]">
-            <div className="mb-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md">
-              <span className="font-mono text-sm text-ink-soft">⌕</span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search stages, tools, resources…"
-                className="w-full bg-transparent font-body text-sm text-white placeholder:text-ink-soft/60 outline-none"
-              />
+        <div className="relative h-screen flex-1 overflow-hidden">
+          {loading && (
+            <div className="flex h-full items-center justify-center border-l border-white/10 bg-ink-deep/70">
+              <p className="font-mono text-sm text-ink-soft">Loading path timeline…</p>
             </div>
+          )}
 
-            {loading && (
-              <div className="flex h-[70vh] items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl">
-                <p className="font-mono text-sm text-ink-soft">Loading path timeline…</p>
-              </div>
-            )}
+          {!loading && error && (
+            <div className="flex h-full items-center justify-center border-l border-white/10 bg-ink-deep/70">
+              <p className="font-body text-sm text-red-400">{error}</p>
+            </div>
+          )}
 
-            {!loading && error && (
-              <div className="flex h-[70vh] items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl">
-                <p className="font-body text-sm text-red-400">{error}</p>
-              </div>
-            )}
-
-            {!loading && !error && tree && <CanvasTree root={tree} searchQuery={searchQuery} />}
-          </section>
+          {!loading && !error && path && (
+            <CanvasTree root={pathToTree(path)} onNodeHover={setHoveredNode} />
+          )}
         </div>
       </div>
     </main>

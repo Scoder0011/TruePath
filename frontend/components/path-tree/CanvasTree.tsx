@@ -86,9 +86,11 @@ function findMatchesAndAncestors(
 export default function CanvasTree({
   root,
   searchQuery = "",
+  onNodeHover,
 }: {
   root: TreeNode;
   searchQuery?: string;
+  onNodeHover?: (node: TreeNode | null) => void;
 }) {
   // Path node starts expanded so the first column of sub-paths is
   // visible immediately; everything deeper starts collapsed.
@@ -162,7 +164,7 @@ export default function CanvasTree({
   }, [positions]);
 
   return (
-    <div className="relative h-[70vh] w-full overflow-hidden rounded-2xl border border-white/10 bg-ink-deep/60 backdrop-blur-xl">
+    <div className="relative h-full w-full overflow-hidden border border-white/10 bg-ink-deep/60 backdrop-blur-xl">
       {/* Zoom controls */}
       <div className="absolute right-4 top-4 z-10 flex flex-col gap-1 rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
         <button
@@ -244,6 +246,8 @@ export default function CanvasTree({
                     href={node.url}
                     target="_blank"
                     rel="noreferrer"
+                    onMouseEnter={() => onNodeHover?.(node)}
+                    onMouseLeave={() => onNodeHover?.(null)}
                     className={`flex h-11 items-center justify-between rounded-lg border bg-white/5 px-3 font-body text-sm text-white backdrop-blur-md transition-colors hover:border-route ${kindColor[node.kind]} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
@@ -254,6 +258,8 @@ export default function CanvasTree({
                 ) : (
                   <button
                     onClick={() => toggle(node)}
+                    onMouseEnter={() => onNodeHover?.(node)}
+                    onMouseLeave={() => onNodeHover?.(null)}
                     className={`flex h-11 w-full items-center justify-between rounded-lg border bg-white/5 px-3 text-left font-body text-sm text-white backdrop-blur-md transition-colors hover:border-amber ${kindColor[node.kind]} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
