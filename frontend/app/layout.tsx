@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import logo from "../logo.png";
 import "./globals.css";
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className="font-body bg-white text-gray-900 antialiased dark:bg-ink-deep dark:text-white">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider>
           <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-white/10 dark:bg-ink/60">
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-6">
               <Link

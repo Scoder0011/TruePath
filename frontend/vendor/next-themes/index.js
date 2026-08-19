@@ -19,14 +19,16 @@ function applyTheme(theme, attribute) {
 
 function ThemeProvider({
   attribute = "class",
-  defaultTheme = "system",
-  enableSystem = true,
+  defaultTheme = "dark",
+  enableSystem = false,
   children,
 }) {
   const [theme, setThemeState] = React.useState(defaultTheme);
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const saved = window.localStorage.getItem("theme");
     if (saved) {
       setThemeState(saved);
@@ -47,7 +49,7 @@ function ThemeProvider({
   }, []);
 
   React.useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || typeof window === "undefined") return;
     applyTheme(theme, attribute);
     window.localStorage.setItem("theme", theme);
   }, [attribute, mounted, theme]);
