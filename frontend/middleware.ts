@@ -6,6 +6,12 @@ import { createServerClient } from "@supabase/ssr";
 // every request, refreshes the token if needed, and keeps the cookie
 // in sync between the browser and server.
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/auth")) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -34,7 +40,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!auth|_next/static|_next/image|favicon.ico).*)"],
 };

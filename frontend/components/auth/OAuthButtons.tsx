@@ -9,20 +9,28 @@ export default function OAuthButtons() {
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
 
   async function handleOAuth(provider: Provider) {
-    console.log('OAuth clicked:', provider)  // ADD THIS
+    console.log("OAuth clicked:", provider);
     setLoadingProvider(provider);
-    const supabase = createClient();
-    console.log('Supabase client created:', supabase)  // ADD THIS
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    console.log('OAuth error:', error)  // ADD THIS
-    // On success, Supabase redirects the browser away immediately —
-    // this only runs if something went wrong before that redirect fired.
-    if (error) setLoadingProvider(null);
+
+    try {
+      const supabase = createClient();
+      console.log("Supabase client created:", supabase);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        console.error("OAuth error:", error);
+        setLoadingProvider(null);
+      }
+    } catch (err) {
+      console.error("OAuth exception:", err);
+      setLoadingProvider(null);
+    }
   }
 
   return (
