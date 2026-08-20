@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import logo from "../logo.png";
+import logo from "@/logo.png";
 import type { User } from "@supabase/supabase-js";
 
 export default function NavbarClient() {
