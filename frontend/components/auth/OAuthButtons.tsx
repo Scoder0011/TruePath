@@ -16,16 +16,29 @@ export default function OAuthButtons() {
       const supabase = createClient();
       console.log("Supabase client created:", supabase);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const result = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) {
-        console.error("OAuth error:", error);
+      console.log("Full OAuth result:", JSON.stringify(result));
+
+      if (result.error) {
+        console.error("OAuth error:", result.error);
         setLoadingProvider(null);
+        return;
+      }
+
+      const oauthUrl =
+        result.data && typeof result.data === "object" && "url" in result.data
+          ? String((result.data as { url?: string }).url)
+          : "";
+
+      if (oauthUrl) {
+        console.log("Manual redirect to:", oauthUrl);
+        window.location.href = oauthUrl;
       }
     } catch (err) {
       console.error("OAuth exception:", err);
