@@ -17,18 +17,33 @@ function ConfirmInner() {
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    async function handleAuth() {
+      // Check existing session first
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         router.replace(next);
         return;
       }
+
+      // Exchange code if present
       const code = new URLSearchParams(window.location.search).get("code");
       if (code) {
-        supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-          if (error) router.replace("/login?error=auth-callback-failed");
-        });
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error("Code exchange failed:", error);
+          router.replace("/login?error=auth-callback-failed");
+        }
+        // success handled by onAuthStateChange
+        return;
       }
-    });
+
+      // No code, no session — timeout fallback after 5 seconds
+      setTimeout(() => {
+        router.replace("/login?error=auth-callback-failed");
+      }, 5000);
+    }
+
+    handleAuth();
 
     return () => subscription.unsubscribe();
   }, [router, next]);
