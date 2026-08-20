@@ -1,15 +1,10 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-// Used inside "use client" components — login/signup forms, OAuth buttons.
-// Reads the same project URL/key as the server client, just via the
-// browser-safe NEXT_PUBLIC_ env vars.
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
-    throw new Error("Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  }
+  if (!url || !key) throw new Error("Missing Supabase env vars");
 
-  return createBrowserClient(url, key);
+  return createSupabaseClient(url, key);
 }
