@@ -6,5 +6,10 @@ export function createClient() {
 
   if (!url || !key) throw new Error("Missing Supabase env vars");
 
-  return createSupabaseClient(url, key);
+  return createSupabaseClient(url, key, {
+    auth: {
+      flowType: "pkce",
+    },
+  });
 }
+  
