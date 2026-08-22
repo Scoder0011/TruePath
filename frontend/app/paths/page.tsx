@@ -117,7 +117,7 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         id: "mobile-security",
         label: "Mobile App Security Testing",
         slug: "mobile-security",
-        status: "coming_soon",
+        status: "active",
         description: "Assess iOS and Android applications for security weaknesses.",
         whoFor: "People interested in mobile platforms and reverse engineering apps.",
         duration: "6–8 months",
