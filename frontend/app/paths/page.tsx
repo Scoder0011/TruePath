@@ -135,7 +135,7 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         id: "social-engineering",
         label: "Social Engineering",
         slug: "social-engineering",
-        status: "coming_soon",
+        status: "active",
         description: "Human-focused attacks — phishing campaigns, pretexting, physical security.",
         whoFor: "People with strong communication skills and interest in human psychology.",
         duration: "4–6 months",
