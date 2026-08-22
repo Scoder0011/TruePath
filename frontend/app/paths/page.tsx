@@ -105,9 +105,9 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         duration: "Advanced",
       },
       {
-        id: "web-app-pentest",
+        id: "web-app-pentesting",
         label: "Web App Pentesting",
-        slug: "web-app-pentest",
+        slug: "web-app-pentesting",
         status: "coming_soon",
         description: "Specialize in finding and exploiting web application vulnerabilities.",
         whoFor: "People focused on web technologies and browser-based attack surfaces.",
