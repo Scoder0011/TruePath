@@ -126,7 +126,7 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         id: "network-infra-pentest",
         label: "Network & Infrastructure Pentesting",
         slug: "network-infra-pentest",
-        status: "coming_soon",
+        status: "active",
         description: "Test internal and external network infrastructure for vulnerabilities.",
         whoFor: "People who like networking, protocols, and Active Directory attacks.",
         duration: "8–12 months",
