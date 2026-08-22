@@ -23,52 +23,45 @@ type SidebarCard = {
   url?: string | null;
 };
 
-function getDefaultPathInfo(pathData: Path): SidebarCard {
-  const primarySpec =
-    pathData.specializations.find(
-      (specialization) => (specialization.stages ?? []).some((stage) => (stage.topics ?? []).length > 0),
-    ) ?? pathData.specializations[0];
-
+function getDefaultInfo(filteredPath: Path): SidebarCard {
+  const spec = filteredPath.specializations[0];
   return {
-    title: pathData.title,
-    description: pathData.description ?? "",
-    prerequisites: primarySpec?.prerequisites ?? "No formal prerequisites listed yet.",
-    duration: primarySpec?.duration ?? "Flexible",
-    career_outcomes: primarySpec?.career_outcomes ?? "Career outcomes will be added soon.",
-    kind: "path",
+    title: spec?.title ?? filteredPath.title,
+    description: spec?.description ?? filteredPath.description ?? "",
+    prerequisites: spec?.prerequisites ?? "No formal prerequisites listed yet.",
+    duration: spec?.duration ?? "Flexible",
+    career_outcomes: spec?.career_outcomes ?? "Career outcomes will be added soon.",
+    kind: "specialization",
   };
 }
 
-function getNodeDetail(node: TreeNode, pathData: Path): SidebarCard | null {
+function getNodeDetail(node: TreeNode, filteredPath: Path): SidebarCard | null {
   if (node.kind === "path") {
     return {
-      title: pathData.title,
-      description: pathData.description ?? "",
+      title: filteredPath.title,
+      description: filteredPath.description ?? "",
       kind: "path",
     };
   }
 
   if (node.kind === "specialization") {
-    const specialization = pathData.specializations.find((item) => item.id === node.id);
-    if (!specialization) return null;
-
+    const spec = filteredPath.specializations.find((s) => s.id === node.id);
+    if (!spec) return null;
     return {
-      title: specialization.title,
-      description: specialization.description ?? "",
-      prerequisites: specialization.prerequisites ?? "No formal prerequisites listed yet.",
-      duration: specialization.duration ?? "Flexible",
-      career_outcomes: specialization.career_outcomes ?? "Career outcomes will be added soon.",
+      title: spec.title,
+      description: spec.description ?? "",
+      prerequisites: spec.prerequisites ?? "No formal prerequisites listed yet.",
+      duration: spec.duration ?? "Flexible",
+      career_outcomes: spec.career_outcomes ?? "Career outcomes will be added soon.",
       kind: "specialization",
     };
   }
 
   if (node.kind === "stage") {
-    const stage = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .find((item) => item.id === node.id);
-
+    const stage = filteredPath.specializations
+      .flatMap((s) => s.stages ?? [])
+      .find((s) => s.id === node.id);
     if (!stage) return null;
-
     return {
       title: stage.title,
       description: stage.description ?? "No stage overview yet.",
@@ -77,35 +70,31 @@ function getNodeDetail(node: TreeNode, pathData: Path): SidebarCard | null {
   }
 
   if (node.kind === "topic") {
-    const topic = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .flatMap((stage) => stage.topics ?? [])
-      .find((item) => item.id === node.id);
-
+    const topic = filteredPath.specializations
+      .flatMap((s) => s.stages ?? [])
+      .flatMap((s) => s.topics ?? [])
+      .find((t) => t.id === node.id);
     if (!topic) return null;
-
     return {
       title: topic.title,
-      description: topic.description ?? "No topic summary yet.",
-      resources: (topic.resources ?? []).map((resource) => ({
-        title: resource.title ?? resource.type,
-        url: resource.url ?? null,
-        type: resource.type,
-        isFree: Boolean(resource.is_free),
+      description: topic.description ?? null,
+      resources: (topic.resources ?? []).map((r) => ({
+        title: r.title ?? r.type,
+        url: r.url ?? null,
+        type: r.type,
+        isFree: Boolean(r.is_free),
       })),
       kind: "topic",
     };
   }
 
   if (node.kind === "resource") {
-    const resource = pathData.specializations
-      .flatMap((specialization) => specialization.stages ?? [])
-      .flatMap((stage) => stage.topics ?? [])
-      .flatMap((topic) => topic.resources ?? [])
-      .find((item) => item.id === node.id);
-
+    const resource = filteredPath.specializations
+      .flatMap((s) => s.stages ?? [])
+      .flatMap((s) => s.topics ?? [])
+      .flatMap((t) => t.resources ?? [])
+      .find((r) => r.id === node.id);
     if (!resource) return null;
-
     return {
       title: resource.title ?? resource.type,
       description: resource.type,
@@ -126,7 +115,11 @@ function getNodeDetail(node: TreeNode, pathData: Path): SidebarCard | null {
   return null;
 }
 
-export default function PathSpecDetailPage({ params }: { params: { pathSlug: string; specSlug: string } }) {
+export default function PathSpecDetailPage({
+  params,
+}: {
+  params: { pathSlug: string; specSlug: string };
+}) {
   const [path, setPath] = useState<Path | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,35 +128,47 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
 
   useEffect(() => {
     let cancelled = false;
-
     setLoading(true);
     setError(null);
 
     getPath(params.pathSlug)
       .then((data) => {
-        if (cancelled) return;
-        setPath(data);
+        if (!cancelled) setPath(data);
       })
       .catch((err: unknown) => {
-        if (cancelled) return;
-        console.error(`Failed to load path "${params.pathSlug}"`, err);
-        setError("Couldn't load this path right now. Please try again in a moment.");
+        if (!cancelled) {
+          console.error(`Failed to load path "${params.pathSlug}"`, err);
+          setError("Couldn't load this path right now. Please try again in a moment.");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [params.pathSlug]);
 
-  const defaultInfo = useMemo(() => (path ? getDefaultPathInfo(path) : null), [path]);
+  // Filter to only the current specialization — this is the key fix
+  const filteredPath = useMemo(() => {
+    if (!path) return null;
+    return {
+      ...path,
+      specializations: path.specializations.filter(
+        (spec) => spec.slug === params.specSlug
+      ),
+    };
+  }, [path, params.specSlug]);
+
+  const defaultInfo = useMemo(
+    () => (filteredPath ? getDefaultInfo(filteredPath) : null),
+    [filteredPath]
+  );
+
   const currentInfo = useMemo(() => {
-    if (!path) return defaultInfo;
+    if (!filteredPath) return defaultInfo;
     if (!hoveredNode) return defaultInfo;
-    return getNodeDetail(hoveredNode, path) ?? defaultInfo;
-  }, [defaultInfo, hoveredNode, path]);
+    return getNodeDetail(hoveredNode, filteredPath) ?? defaultInfo;
+  }, [defaultInfo, hoveredNode, filteredPath]);
 
   const specTitle = useMemo(() => {
     return params.specSlug
@@ -174,35 +179,62 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
 
   const renderContent = (info: SidebarCard | null) => {
     if (!info) {
-      return <p className="font-body text-sm text-gray-600 dark:text-ink-soft">No details available for this node.</p>;
+      return (
+        <p className="font-body text-sm text-gray-600 dark:text-ink-soft">
+          No details available for this node.
+        </p>
+      );
     }
 
     return (
       <div className="space-y-5">
+        {/* Title + description for path/specialization/stage */}
         {info.kind !== "topic" && info.kind !== "resource" && (
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
-              {info.kind === "path" ? "OVERVIEW" : info.kind === "specialization" ? "DESCRIPTION" : "STAGE"}
+              {info.kind === "path"
+                ? "OVERVIEW"
+                : info.kind === "specialization"
+                ? "DESCRIPTION"
+                : "STAGE"}
             </p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
+            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">
+              {info.title}
+            </h2>
             {info.description && (
-              <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.description}</p>
+              <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">
+                {info.description}
+              </p>
             )}
           </div>
         )}
 
+        {/* Topic */}
         {info.kind === "topic" && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">TOPIC</p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
-            {info.description && <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.description}</p>}
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+              TOPIC
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">
+              {info.title}
+            </h2>
+            {info.description && (
+              <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">
+                {info.description}
+              </p>
+            )}
           </div>
         )}
 
+        {/* Resource */}
         {info.kind === "resource" && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCE</p>
-            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+              RESOURCE
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">
+              {info.title}
+            </h2>
             {info.typeLabel && (
               <div className="mt-3 flex items-center gap-2">
                 <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-soft">
@@ -233,34 +265,48 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
           </div>
         )}
 
+        {/* Prerequisites / Duration / Career outcomes */}
         {info.kind !== "resource" && info.kind !== "topic" && (
           <>
             {info.prerequisites && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">PREREQUISITES</p>
-                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.prerequisites}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+                  PREREQUISITES
+                </p>
+                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">
+                  {info.prerequisites}
+                </p>
               </div>
             )}
-
             {info.duration && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION</p>
-                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.duration}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+                  DURATION
+                </p>
+                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">
+                  {info.duration}
+                </p>
               </div>
             )}
-
             {info.career_outcomes && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER OUTCOMES</p>
-                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.career_outcomes}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+                  CAREER OUTCOMES
+                </p>
+                <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">
+                  {info.career_outcomes}
+                </p>
               </div>
             )}
           </>
         )}
 
+        {/* Topic resources list */}
         {info.kind === "topic" && info.resources && info.resources.length > 0 && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCES</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+              RESOURCES
+            </p>
             <div className="mt-3 space-y-3">
               {info.resources.map((resource) => (
                 <a
@@ -271,19 +317,23 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
                   className="block rounded-xl border border-gray-200 bg-gray-50 p-3 text-left transition-colors hover:border-amber/70 dark:border-white/10 dark:bg-white/5"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-body text-sm text-gray-900 dark:text-white">{resource.title}</span>
+                    <span className="font-body text-sm text-gray-900 dark:text-white">
+                      {resource.title}
+                    </span>
                     <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-soft">
                       {resource.type}
                     </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-gray-600 dark:text-ink-soft">
-                      {resource.url ? "Open" : "No link"}
+                      {resource.url ? "Open ↗" : "No link"}
                     </span>
                     <span
                       className={[
                         "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
-                        resource.isFree ? "bg-route/10 text-route" : "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-ink-soft",
+                        resource.isFree
+                          ? "bg-route/10 text-route"
+                          : "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-ink-soft",
                       ].join(" ")}
                     >
                       {resource.isFree ? "Free" : "Paid"}
@@ -301,14 +351,16 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
   return (
     <main className="h-screen overflow-hidden bg-white text-gray-900 dark:bg-ink-deep dark:text-white">
       <div className="relative flex h-screen flex-col md:flex-row">
+        {/* Mobile toggle */}
         <button
           type="button"
-          onClick={() => setSidebarOpen((current) => !current)}
+          onClick={() => setSidebarOpen((v) => !v)}
           className="absolute left-4 top-4 z-20 rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-soft md:hidden"
         >
           {sidebarOpen ? "Hide info" : "Path info"}
         </button>
 
+        {/* Left sidebar */}
         <aside
           className={[
             "z-10 h-full w-full border-r border-gray-200 bg-gray-50/80 backdrop-blur-xl md:w-[280px] md:shrink-0 dark:border-white/10 dark:bg-white/5",
@@ -317,51 +369,64 @@ export default function PathSpecDetailPage({ params }: { params: { pathSlug: str
         >
           <div className="flex min-h-0 w-full flex-col">
             <div className="px-4 pb-3 pt-4">
-              <Link href="/paths" className="font-mono text-xs text-gray-600 transition-opacity hover:opacity-80 dark:text-ink-soft">
+              <Link
+                href="/paths"
+                className="font-mono text-xs text-gray-600 transition-opacity hover:opacity-80 dark:text-ink-soft"
+              >
                 ← Back to all paths
               </Link>
-
               <div className="mt-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">SPECIALIZATION</p>
-                <h1 className="mt-2 font-display text-2xl font-bold text-gray-900 dark:text-white">{specTitle}</h1>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+                  SPECIALIZATION
+                </p>
+                <h1 className="mt-2 font-display text-2xl font-bold text-gray-900 dark:text-white">
+                  {specTitle}
+                </h1>
               </div>
-
               <div className="mt-4 border-t border-gray-200 dark:border-white/10" />
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 pb-6">
               {loading && (
                 <div className="flex min-h-[220px] items-center justify-center">
-                  <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">Loading path details…</p>
+                  <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">
+                    Loading…
+                  </p>
                 </div>
               )}
-
               {!loading && error && (
                 <div className="flex min-h-[220px] items-center justify-center text-center">
                   <p className="font-body text-sm text-red-400">{error}</p>
                 </div>
               )}
-
               {!loading && !error && currentInfo && renderContent(currentInfo)}
             </div>
           </div>
         </aside>
 
+        {/* Canvas */}
         <div className="relative h-screen flex-1 overflow-hidden">
           {loading && (
-            <div className="flex h-full items-center justify-center border-l border-gray-200 bg-gray-100/80 dark:border-white/10 dark:bg-ink-deep/70">
-              <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">Loading path timeline…</p>
+            <div className="flex h-full items-center justify-center">
+              <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">
+                Loading path timeline…
+              </p>
             </div>
           )}
-
           {!loading && error && (
-            <div className="flex h-full items-center justify-center border-l border-gray-200 bg-gray-100/80 dark:border-white/10 dark:bg-ink-deep/70">
+            <div className="flex h-full items-center justify-center">
               <p className="font-body text-sm text-red-400">{error}</p>
             </div>
           )}
-
-          {!loading && !error && path && (
-            <CanvasTree root={pathToTree(path)} onNodeHover={setHoveredNode} />
+          {!loading && !error && filteredPath && filteredPath.specializations.length > 0 && (
+            <CanvasTree root={pathToTree(filteredPath)} onNodeHover={setHoveredNode} />
+          )}
+          {!loading && !error && filteredPath && filteredPath.specializations.length === 0 && (
+            <div className="flex h-full items-center justify-center">
+              <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">
+                No content found for this specialization yet.
+              </p>
+            </div>
           )}
         </div>
       </div>
