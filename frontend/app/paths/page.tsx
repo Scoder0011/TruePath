@@ -90,7 +90,7 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         id: "bug-bounty",
         label: "Bug Bounty Hunting",
         slug: "bug-bounty",
-        status: "coming_soon",
+        status: "active",
         description: "Find vulnerabilities in real production systems for monetary rewards.",
         whoFor: "Self-directed learners who want flexible, outcome-based work.",
         duration: "Ongoing",
