@@ -114,9 +114,9 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         duration: "6–10 months",
       },
       {
-        id: "mobile-security",
+        id: "mobile-app-pentesting",
         label: "Mobile App Security Testing",
-        slug: "mobile-security",
+        slug: "mobile-app-pentesting",
         status: "active",
         description: "Assess iOS and Android applications for security weaknesses.",
         whoFor: "People interested in mobile platforms and reverse engineering apps.",
