@@ -215,3 +215,87 @@ Pick one and go deep — don't keep consuming courses.
 5. Writing custom Frida scripts + automation
 --> TYPE (READING) https://frida.re/docs/javascript-api/
 --> TYPE (PRACTICE) https://codeshare.frida.re/
+
+
+
+
+
+
+========================================
+4-> Bug Bounty Hunting
+========================================
+
+-------------------------
+----Stage 1 — Basics----
+--------------------------
+[GENERAL CONCEPTS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/293
+--> TYPE (READING) https://www.netacad.com/courses/introduction-to-cybersecurity?courseLang=en-US
+
+[NETWORKING FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/34 
+--> TYPE (VIDEO)  https://www.youtube.com/watch?v=qiQR5rTSshw
+--> TYPE (PRACTICE) https://www.netacad.com/cisco-packet-tracer
+--> TYPE (TOOLS) 
+----------------> Wireshark , Nmap , Netcat 
+
+[LINUX FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/linux-fundamentals
+--> TYPE (READING) https://linuxbasecamp.com/tutorials
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=sWbUDq4S6Y8
+--> TYPE (PRACTICE) https://overthewire.org/wargames/bandit/bandit0.html
+
+[WINDOWS FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/windows-fundamentals
+
+[SCRIPTING]
+1--> BASH
+--> TYPE (READING) https://www.learnshell.org/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=tK9Oc6AEnR4
+2--> PYTHON
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/introduction-to-python-3
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=0fC1JsN8AsM
+--> TYPE (PRACTICE) https://codecombat.com/
+
+
+-------------------------
+----Stage 2 — Choose Your Skill----
+--------------------------
+[NOTE]
+Bug Bounty is not a technical specialization by itself.  
+It is the application of real skills on live programs.
+
+Before moving to Stage 3, complete **at least one** specialization:
+
+- Web Application Penetration Testing
+- Mobile Application Penetration Testing
+- (or any other technical path available)
+
+Once you finish one specialization, return here for Stage 3.
+
+
+-------------------------
+----Stage 3 — Real World Hunting----
+--------------------------
+[NOTE]
+You now have real technical skills.  
+This stage is about applying them professionally on live targets.
+
+[REPORT WRITING]
+--> TYPE (READING) https://www.hackerone.com/resources/report-writing
+--> TYPE (READING) https://bugcrowd.com/resources/guides/writing-a-bug-bounty-report
+
+[RECON & METHODOLOGY]
+--> TYPE (READING) https://github.com/projectdiscovery
+--> TYPE (TOOLS) 
+----------------> amass, subfinder, httpx, nuclei, ffuf, gau, waybackurls
+
+[LIVE PROGRAMS]
+--> TYPE (PRACTICE) https://www.hackerone.com/hackers
+--> TYPE (PRACTICE) https://bugcrowd.com/programs
+--> TYPE (PRACTICE) https://www.intigriti.com/researchers
+
+[MINDSET]
+--> Focus on consistency over tools
+--> Read real writeups and learn from duplicates
+--> Start with programs that have clear scope and good reputation
