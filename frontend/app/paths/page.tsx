@@ -99,7 +99,7 @@ const CYBERSECURITY_TREE: TeamNode[] = [
         id: "vuln-research",
         label: "Vulnerability Research & Exploit Dev",
         slug: "vuln-research",
-        status: "coming_soon",
+        status: "active",
         description: "Discover new vulnerabilities and write working exploits.",
         whoFor: "People who like low-level systems, C/C++, and original research.",
         duration: "Advanced",

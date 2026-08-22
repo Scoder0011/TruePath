@@ -299,3 +299,151 @@ This stage is about applying them professionally on live targets.
 --> Focus on consistency over tools
 --> Read real writeups and learn from duplicates
 --> Start with programs that have clear scope and good reputation
+
+
+
+================================================
+5-> Vulnerability Research & Exploit Development
+================================================
+
+-------------------------
+----Stage 1 — Basics----
+--------------------------
+
+[GENERAL CONCEPTS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/293
+--> TYPE (READING) https://www.netacad.com/courses/introduction-to-cybersecurity?courseLang=en-US
+
+[NETWORKING FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/34 
+--> TYPE (VIDEO)  https://www.youtube.com/watch?v=qiQR5rTSshw
+--> TYPE (PRACTICE) https://www.netacad.com/cisco-packet-tracer
+--> TYPE (TOOLS) 
+----------------> Wireshark , Nmap , Netcat 
+
+[LINUX FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/linux-fundamentals
+--> TYPE (READING) https://linuxbasecamp.com/tutorials
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=sWbUDq4S6Y8
+--> TYPE (PRACTICE) https://overthewire.org/wargames/bandit/bandit0.html
+
+[SCRIPTING]
+1--> BASH
+--> TYPE (READING) https://www.learnshell.org/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=tK9Oc6AEnR4
+2--> PYTHON
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/introduction-to-python-3
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=0fC1JsN8AsM
+--> TYPE (PRACTICE) https://codecombat.com/
+
+
+-------------------------
+----Stage 2— Foundations----
+--------------------------
+
+[COMPUTER ARCHITECTURE & MEMORY]
+--> TYPE (READING) https://csapp.cs.cmu.edu/ (Computer Systems: A Programmer’s Perspective – free lecture notes & labs)
+--> TYPE (VIDEO)   https://www.youtube.com/@LowLevelLearning
+
+[ASSEMBLY — x86-64]
+--> TYPE (READING + LABS) https://p.ost2.fyi/courses (OpenSecurityTraining2 – Architecture 1001: x86-64 Assembly – free)
+--> TYPE (VIDEO)          https://www.youtube.com/playlist?list=PL0C5C980A28FE4ED5 (Creel – Modern x64 Assembly)
+--> TYPE (PRACTICE)       https://godbolt.org/ (Compiler Explorer)
+
+[LINUX INTERNALS]
+--> TYPE (READING) https://www.kernel.org/doc/html/latest/
+--> TYPE (READING) https://0xax.gitbooks.io/linux-insides/content/
+--> TYPE (PRACTICE) https://pwn.college/ (start with the Linux & Interaction modules)
+
+[C PROGRAMMING (Focused on Memory & Security)]
+--> TYPE (READING) https://www.learn-c.org/
+--> TYPE (READING) https://github.com/gerasdf/InsecureProgramming (classic vulnerable C exercises)
+--> TYPE (PRACTICE) Write small programs and intentionally break them (buffer overflows, format strings)
+
+[DEBUGGING]
+--> TYPE (TOOL)    GDB + pwndbg or GEF
+--> TYPE (READING) https://sourceware.org/gdb/current/onlinedocs/gdb/
+--> TYPE (PRACTICE) https://pwn.college/ + https://ropemporium.com/
+
+[PYTHON FOR EXPLOIT DEV]
+--> TYPE (READING) https://docs.pwntools.com/
+--> TYPE (PRACTICE) Use pwntools from day one while doing the above labs
+
+-------------------------
+----Stage 3 — Core Vulnerability Research----
+--------------------------
+
+[BINARY ANALYSIS & REVERSE ENGINEERING]
+--> TYPE (TOOL)     Ghidra — https://ghidra-sre.org/
+--> TYPE (PRACTICE) https://pwn.college/
+--> TYPE (PRACTICE) https://begin.re/
+
+[MANUAL CODE AUDITING]
+--> TYPE (TOOL)     CodeQL — https://codeql.github.com/docs/ (+ github/codeql security queries repo)
+--> TYPE (TOOL)     Semgrep — https://semgrep.dev/docs/
+--> TYPE (READING)  "The Art of Software Security Assessment" (Dowd/McDonald/Schuh) — reference text for auditing methodology
+--> TYPE (PRACTICE) Pick a small OSS project with a patched CVE, diff patch vs pre-patch, find the bug pre-diff
+
+[COMMON VULNERABILITY CLASSES]
+--> TYPE (READING + PRACTICE) https://github.com/gerasdf/InsecureProgramming
+--> TYPE (PRACTICE)           https://exploit.education/phoenix/
+--> TYPE (PRACTICE)           Format strings — https://ctf101.org/binary-exploitation/what-is-a-format-string-vulnerability/
+--> TYPE (PRACTICE)           Format strings — exploit.education Format stages
+
+[FUZZING]
+--> TYPE (TOOL)     AFL++ — https://github.com/AFLplusplus/AFLplusplus
+--> TYPE (TOOL)     libFuzzer — https://llvm.org/docs/LibFuzzer.html
+--> TYPE (READING)  https://github.com/google/fuzzing (Google's fuzzing training curriculum)
+--> TYPE (PRACTICE) https://github.com/google/fuzzing/tree/master/tutorial/libFuzzerTutorial
+--> TYPE (READING)  https://aflplus.plus/docs/fuzzing_in_depth/ (corpus mgmt, cmin, persistent mode)
+--> TYPE (TOOL)     casr — https://github.com/ispras/casr (crash triage/dedup/severity)
+--> TYPE (PRACTICE) Fuzz your own small C programs + known vulnerable targets
+
+[TOOLS YOU MUST MASTER]
+--> GDB + pwndbg / GEF
+--> pwntools
+--> checksec, ROPgadget / ropper
+--> radare2 / Cutter (optional but useful)
+
+
+-------------------------
+----Stage 4 — Exploit Development----
+--------------------------
+
+[MODERN MITIGATIONS]
+--> TYPE (READING) ASLR, NX/DEP, Stack Canaries, PIE, RELRO, CFI
+--> TYPE (PRACTICE) Disable them one by one and re-enable them while exploiting
+
+[RETURN-ORIENTED PROGRAMMING (ROP)]
+--> TYPE (PRACTICE) https://ropemporium.com/
+--> TYPE (PRACTICE) https://pwn.college/ (ROP modules)
+
+[GDB SCRIPTING / AUTOMATION]
+--> TYPE (READING)  https://sourceware.org/gdb/onlinedocs/gdb/Python-API.html
+--> TYPE (PRACTICE) Write a pwndbg/GEF plugin or gdbscript to automate a repetitive step from one of your solves
+
+[HEAP EXPLOITATION]
+--> TYPE (TOOL)                pwninit — https://github.com/io12/pwninit (auto-patch binary to target libc)
+--> TYPE (TOOL)                glibc-all-in-one — https://github.com/matrix1001/glibc-all-in-one
+--> TYPE (READING + PRACTICE)  https://github.com/shellphish/how2heap
+--> TYPE (READING)             https://heap-exploitation.dhavalkapil.com/
+--> TYPE (PRACTICE)            https://pwn.college/ (Heap modules)
+
+[WRITING RELIABLE EXPLOITS]
+--> TYPE (PRACTICE) Take CTF challenges from pwnable.tw, pwnable.kr, or recent CTFs
+--> TYPE (GOAL)     Write clean, reliable exploits using pwntools
+--> TYPE (GOAL)     Document your process (root cause → primitive → full exploit)
+
+[OPTIONAL ADVANCED]
+
+  [KERNEL EXPLOITATION]
+  --> TYPE (READING)  https://xairy.io/articles/kernel-exploitation-index
+  --> TYPE (PRACTICE) https://github.com/xairy/linux-kernel-exploitation
+
+  [BROWSER / JS ENGINE EXPLOITATION]
+  --> TYPE (READING)  https://github.com/tunz/js-vuln-db (annotated JS engine CVEs + PoCs)
+  --> TYPE (PRACTICE) Build d8/v8 from source, reproduce a known CVE
+
+  [1-DAY / N-DAY RESEARCH METHODOLOGY]
+  --> TYPE (READING) https://a13xp0p0v.github.io/2020/02/15/CVE-2019-18683.html (patch-diffing case study)
+  --> TYPE (TOOL)    bindiff — https://github.com/google/bindiff
