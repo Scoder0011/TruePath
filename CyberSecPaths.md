@@ -447,3 +447,9 @@ This stage is about applying them professionally on live targets.
   [1-DAY / N-DAY RESEARCH METHODOLOGY]
   --> TYPE (READING) https://a13xp0p0v.github.io/2020/02/15/CVE-2019-18683.html (patch-diffing case study)
   --> TYPE (TOOL)    bindiff — https://github.com/google/bindiff
+
+  can you tell me what is actually happening 
+  ok the issue is that i cant locally test the frontend it keeps giving that build error i showed u yesterday
+
+  ok leme see 
+  bro i installed npm yesterday as well as node.js
