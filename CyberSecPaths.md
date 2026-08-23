@@ -448,8 +448,106 @@ This stage is about applying them professionally on live targets.
   --> TYPE (READING) https://a13xp0p0v.github.io/2020/02/15/CVE-2019-18683.html (patch-diffing case study)
   --> TYPE (TOOL)    bindiff — https://github.com/google/bindiff
 
-  can you tell me what is actually happening 
-  ok the issue is that i cant locally test the frontend it keeps giving that build error i showed u yesterday
+s
+================================================
+6-> Network & Infrastructure Pentesting
+================================================
 
-  ok leme see 
-  bro i installed npm yesterday as well as node.js
+-------------------------
+----Stage 1 — Basics----
+--------------------------
+[GENERAL CONCEPTS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/293
+--> TYPE (READING) https://www.netacad.com/courses/introduction-to-cybersecurity?courseLang=en-US
+
+[NETWORKING FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/app/module/34 
+--> TYPE (VIDEO)  https://www.youtube.com/watch?v=qiQR5rTSshw
+--> TYPE (PRACTICE) https://www.netacad.com/cisco-packet-tracer
+--> TYPE (TOOLS) 
+----------------> Wireshark , Nmap , Netcat 
+
+[LINUX FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/linux-fundamentals
+--> TYPE (READING) https://linuxbasecamp.com/tutorials
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=sWbUDq4S6Y8
+--> TYPE (PRACTICE) https://overthewire.org/wargames/bandit/bandit0.html
+
+[WINDOWS FUNDAMENTALS]
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/windows-fundamentals
+
+[SCRIPTING]
+1--> BASH
+--> TYPE (READING) https://www.learnshell.org/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=tK9Oc6AEnR4
+2--> PYTHON
+--> TYPE (READING) https://academy.hackthebox.com/course/preview/introduction-to-python-3
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=0fC1JsN8AsM
+--> TYPE (PRACTICE) https://codecombat.com/
+
+
+-------------------------
+----Stage 2 — Core Network & Infrastructure----
+--------------------------
+
+[SCANNING & ENUMERATION]
+--> TYPE (TOOL)     Nmap (deep dive)
+--> TYPE (PRACTICE) https://nmap.org/book/man.html
+--> TYPE (READING)  https://book.hacktricks.xyz/generic-methodologies-and-resources/pentesting-methodology
+
+[SERVICE EXPLOITATION]
+--> TYPE (READING)  https://book.hacktricks.xyz/
+--> TYPE (PRACTICE) https://tryhackme.com/hacktivities
+--> TYPE (PRACTICE) https://www.hackthebox.com/machines
+
+[LINUX PRIVILEGE ESCALATION]
+--> TYPE (READING)  https://book.hacktricks.xyz/linux-hardening/privilege-escalation
+--> TYPE (TOOL)     LinPEAS — https://github.com/carlospolop/PEASS-ng
+--> TYPE (READING)  https://gtfobins.github.io/
+--> TYPE (PRACTICE) https://tryhackme.com/module/linux-privilege-escalation
+
+[WINDOWS PRIVILEGE ESCALATION]
+--> TYPE (READING)  https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
+--> TYPE (TOOL)     WinPEAS — https://github.com/carlospolop/PEASS-ng
+--> TYPE (READING)  https://lolbas-project.github.io/
+--> TYPE (PRACTICE) https://tryhackme.com/module/windows-privilege-escalation
+
+[PASSWORD ATTACKS & CREDENTIAL ACCESS]
+--> TYPE (TOOLS)    Hashcat, John the Ripper, Responder, NetExec (CrackMapExec)
+--> TYPE (PRACTICE) https://tryhackme.com/module/password-attacks
+--> TYPE (PRACTICE) https://tryhackme.com/room/passwordattacks
+
+
+-------------------------
+----Stage 3 — Advanced / Real World----
+--------------------------
+
+[ACTIVE DIRECTORY]
+--> TYPE (READING)  https://book.hacktricks.xyz/windows-hardening/active-directory-methodology
+--> TYPE (TOOL)     BloodHound — https://github.com/BloodHoundAD/BloodHound
+--> TYPE (TOOL)     Impacket — https://github.com/fortra/impacket
+--> TYPE (TOOL)     NetExec — https://github.com/Pennyw0rth/NetExec
+--> TYPE (PRACTICE) https://tryhackme.com/module/active-directory
+
+[PIVOTING & LATERAL MOVEMENT]
+--> TYPE (TOOLS)    Chisel, Ligolo-ng, sshuttle, socat
+--> TYPE (READING)  https://book.hacktricks.xyz/generic-methodologies-and-resources/tunneling-and-port-forwarding
+
+[INTERNAL NETWORK METHODOLOGY]
+--> TYPE (READING)  https://www.pentest-standard.org/ (PTES)
+--> TYPE (PRACTICE) Full multi-machine labs (HTB Pro Labs, TryHackMe AD networks, GOAD)
+
+[REPORTING]
+--> TYPE (READING)  https://github.com/juliocesarfort/public-pentesting-reports
+--> TYPE (READING)  https://www.offensive-security.com/reports/sample-penetration-testing-report.pdf
+
+[NOTE]
+You now have solid Network & Infrastructure skills.  
+From here you can move into:
+- Red Team Operations
+- OSCP / PNPT preparation
+- Internal / Assumed Breach pentesting roles
+- Active Directory specialized roles
+
+Pick one direction and go deep.
+>>>>>>> 7990b556c0610d89165b6924d63d7c14d36e8881
