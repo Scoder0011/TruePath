@@ -2,6 +2,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ROADMAPS } from "@/lib/constants/roadmaps";
 
+type ProgressRow = {
+  spec_slug: string;
+  resource_id: string;
+};
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
@@ -11,7 +16,8 @@ export default async function DashboardPage() {
   const { data: progressRows } = await supabase
     .from("user_progress")
     .select("spec_slug, resource_id")
-    .eq("user_id", user!.id);
+    .eq("user_id", user!.id)
+  .returns<ProgressRow[]>();
 
   // Group completed resource ids by specialization, then compute how
   // many whole STAGES are done (all resources in that stage present)
