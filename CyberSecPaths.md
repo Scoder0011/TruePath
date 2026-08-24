@@ -550,4 +550,68 @@ From here you can move into:
 - Active Directory specialized roles
 
 Pick one direction and go deep.
+<<<<<<< Updated upstream
 >>>>>>> 7990b556c0610d89165b6924d63d7c14d36e8881
+=======
+
+
+
+===============================
+Social Engineering — Full Path
+===============================
+
+---------------------
+Stage 1 — Foundations---
+---------------------
+
+[WHAT IS SOCIAL ENGINEERING]
+--> TYPE (READING) https://www.social-engineer.org/framework/general-discussion/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=lc7scxvKQOo (Chris Hadnagy — SE fundamentals)
+
+[HUMAN PSYCHOLOGY & INFLUENCE]
+--> TYPE (READING) https://www.social-engineer.org/framework/influencing-others/influence-tactics/
+--> TYPE (READING) https://www.verywellmind.com/cialdinis-6-principles-of-influence-2795539 (Cialdini's 6 principles)
+
+[OSINT & RECONNAISSANCE]
+--> TYPE (READING) https://osintframework.com/
+--> TYPE (READING) https://github.com/jivoi/awesome-osint
+--> TYPE (PRACTICE) https://tryhackme.com/module/introduction-to-osint
+--> TYPE (TOOLS) Maltego (free community), Sherlock, theHarvester
+
+[LEGAL & ETHICAL FRAMEWORK]
+--> TYPE (READING) https://www.social-engineer.org/framework/attacking-the-mind/social-engineering-code-of-ethics/
+
+------------------------
+Stage 2 — Core Skills---
+------------------------
+
+[PHISHING & EMAIL ATTACKS]
+--> TYPE (READING) https://tryhackme.com/room/phishingyl
+--> TYPE (PRACTICE) https://tryhackme.com/room/phishingyl
+--> TYPE (TOOL) GoPhish — https://getgophish.com/ (free, open source phishing framework)
+--> TYPE (TOOL) SET (Social Engineer Toolkit) — https://github.com/trustedsec/social-engineer-toolkit
+
+[VISHING]
+--> TYPE (READING) https://www.social-engineer.org/framework/attack-vectors/vishing/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=lc7scxvKQOo
+
+[PHYSICAL SECURITY]
+--> TYPE (READING) https://www.social-engineer.org/framework/attack-vectors/physical/
+--> TYPE (VIDEO) https://www.youtube.com/watch?v=rnmcRTnTNC8 (DEF CON — physical SE talk)
+
+-----------------------
+Stage 3 — Real World
+-----------------------
+
+[NOTE]
+You understand how attackers exploit human nature. From here you can 
+specialize in running full SE engagements as part of Red Team Operations,
+or focus on Security Awareness training roles. Pick one and go deep.
+
+[RUNNING A FULL SE ENGAGEMENT]
+--> TYPE (READING) https://www.social-engineer.org/framework/se-tools/
+--> TYPE (PRACTICE) https://tryhackme.com/room/socialengineering
+
+[SE REPORT WRITING]
+--> TYPE (READING) https://github.com/juliocesarfort/public-pentesting-reports
+>>>>>>> Stashed changes
