@@ -13,18 +13,19 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: progressRows } = await supabase
-    .from("user_progress")
-    .select("spec_slug, resource_id")
-    .eq("user_id", user!.id as string)
-  .returns<ProgressRow[]>();
+const { data: rawRows } = await supabase
+  .from("user_progress")
+  .select("spec_slug, resource_id")
+  .eq("user_id", user!.id as string);
+
+const progressRows = (rawRows ?? []) as ProgressRow[];
 
   // Group completed resource ids by specialization, then compute how
   // many whole STAGES are done (all resources in that stage present)
   // rather than a raw resource count -- matches how the roadmap page
   // itself defines "stage complete".
   const completedResourcesBySpec = new Map<string, Set<string>>();
-  (progressRows ?? []).forEach((row) => {
+  progressRows.forEach((row) => {
     if (!completedResourcesBySpec.has(row.spec_slug)) {
       completedResourcesBySpec.set(row.spec_slug, new Set());
     }
