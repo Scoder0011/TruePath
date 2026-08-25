@@ -29,15 +29,16 @@ function layout(
   expanded: Set<string>,
   rowCounter: { n: number },
   positions: Map<string, Position>,
-  edges: Edge[]
+  edges: Edge[],
+  lockedNodeIds?: Set<string>,
 ): Position {
   const hasChildren = !!node.children?.length;
-  const isOpen = expanded.has(node.id);
+  const isOpen = expanded.has(node.id) && !lockedNodeIds?.has(node.id);
 
   const childPositions: Position[] = [];
   if (hasChildren && isOpen) {
     for (const child of node.children!) {
-      childPositions.push(layout(child, depth + 1, expanded, rowCounter, positions, edges));
+      childPositions.push(layout(child, depth + 1, expanded, rowCounter, positions, edges, lockedNodeIds));
     }
   }
 
@@ -87,10 +88,16 @@ export default function CanvasTree({
   root,
   searchQuery = "",
   onNodeHover,
+  completedResourceIds,
+  onResourceToggle,
+  lockedNodeIds,
 }: {
   root: TreeNode;
   searchQuery?: string;
   onNodeHover?: (node: TreeNode | null) => void;
+  completedResourceIds?: Set<string>;
+  onResourceToggle?: (node: TreeNode, completed: boolean) => void;
+  lockedNodeIds?: Set<string>;
 }) {
   // Path node starts expanded so the first column of sub-paths is
   // visible immediately; everything deeper starts collapsed.
@@ -117,9 +124,9 @@ export default function CanvasTree({
   const { positions, edges } = useMemo(() => {
     const positions = new Map<string, Position>();
     const edges: Edge[] = [];
-    layout(root, 0, effectiveExpanded, { n: 0 }, positions, edges);
+    layout(root, 0, effectiveExpanded, { n: 0 }, positions, edges, lockedNodeIds);
     return { positions, edges };
-  }, [root, effectiveExpanded]);
+  }, [root, effectiveExpanded, lockedNodeIds]);
 
   const toggle = useCallback((node: TreeNode) => {
     if (!node.children?.length) return; // resource nodes have no toggle
@@ -234,6 +241,7 @@ export default function CanvasTree({
             const pos = positions.get(node.id)!;
             const isLeaf = !node.children?.length;
             const isOpen = effectiveExpanded.has(node.id);
+            const isLocked = lockedNodeIds?.has(node.id) ?? false;
             const isMatch = matchIds.has(node.id);
             return (
               <div
@@ -242,32 +250,34 @@ export default function CanvasTree({
                 style={{ left: pos.x, top: pos.y, width: NODE_WIDTH }}
               >
                 {isLeaf && node.url ? (
-                  <a
-                    href={node.url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <div
                     onMouseEnter={() => onNodeHover?.(node)}
                     onMouseLeave={() => onNodeHover?.(null)}
                     className={`flex h-11 items-center justify-between rounded-lg border bg-white/80 px-3 font-body text-sm text-gray-900 backdrop-blur-md transition-colors hover:border-route dark:bg-white/5 dark:text-white ${kindColor[node.kind]} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
                   >
-                    <span className="truncate">{node.label}</span>
-                    <span className="ml-2 shrink-0 font-mono text-[10px] text-route">↗</span>
-                  </a>
+                    <label className="flex min-w-0 items-center gap-2">
+                      {onResourceToggle && <input type="checkbox" checked={completedResourceIds?.has(node.id) ?? false} onChange={(event) => onResourceToggle(node, event.target.checked)} onClick={(event) => event.stopPropagation()} aria-label={`Mark ${node.label} complete`} className="h-4 w-4 accent-amber" />}
+                      <span className="truncate">{node.label}</span>
+                    </label>
+                    <a href={node.url} target="_blank" rel="noreferrer" className="ml-2 shrink-0 font-mono text-[10px] text-route">↗</a>
+                  </div>
                 ) : (
                   <button
-                    onClick={() => toggle(node)}
+                    onClick={() => !isLocked && toggle(node)}
                     onMouseEnter={() => onNodeHover?.(node)}
                     onMouseLeave={() => onNodeHover?.(null)}
+                    disabled={isLocked}
                     className={`flex h-11 w-full items-center justify-between rounded-lg border bg-white/80 px-3 text-left font-body text-sm text-gray-900 backdrop-blur-md transition-colors hover:border-amber dark:bg-white/5 dark:text-white ${kindColor[node.kind]} ${
+                      isLocked ? "cursor-not-allowed opacity-50" : ""} ${
                       isMatch ? "ring-2 ring-amber" : ""
                     }`}
                   >
                     <span className="truncate">{node.label}</span>
                     {!isLeaf && (
                       <span className="ml-2 shrink-0 font-mono text-xs text-gray-500 dark:text-ink-soft">
-                        {isOpen ? "−" : "+"}
+                        {isLocked ? "LOCKED" : isOpen ? "−" : "+"}
                       </span>
                     )}
                   </button>

@@ -8,7 +8,12 @@ if (!apiUrl) {
   throw new Error("Missing API_URL or NEXT_PUBLIC_API_URL environment variable");
 }
 
-const apiBaseUrl = apiUrl.replace(/\/+$/, "");
+const configuredApiUrl = apiUrl.replace(/\/+$/, "");
+// Render is configured with the service origin, while Express mounts every
+// route beneath /api. Keep URLs that already include /api valid as well.
+const apiBaseUrl = configuredApiUrl.endsWith("/api")
+  ? configuredApiUrl
+  : `${configuredApiUrl}/api`;
 
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
   const url = new URL(path.replace(/^\/+/, ""), `${apiBaseUrl}/`).toString();
@@ -33,4 +38,10 @@ export async function getPath(slug: string): Promise<Path> {
 
 export async function getAllPaths(): Promise<Path[]> {
   return apiClient<Path[]>(`/paths`);
+}
+
+export async function getSpecialization(pathSlug: string, specSlug: string) {
+  return apiClient<import("@/lib/types/path-tree").Specialization>(
+    `/paths/${pathSlug}/specializations/${specSlug}`
+  );
 }

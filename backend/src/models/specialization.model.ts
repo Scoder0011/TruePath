@@ -5,6 +5,7 @@ export async function getSpecializationWithFullTree(pathSlug: string, specSlug: 
     .from('specializations')
     .select(`
       *,
+      paths!inner (slug),
       stages (
         *,
         topics (
@@ -15,6 +16,7 @@ export async function getSpecializationWithFullTree(pathSlug: string, specSlug: 
       )
     `)
     .eq('slug', specSlug)
+    .eq('paths.slug', pathSlug)
     .single();
 
   if (error) throw error;

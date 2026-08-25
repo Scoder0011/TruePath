@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-export type ProgressRow = { spec_slug: string; stage_id: string; resource_id: string };
+export type ProgressRow = { path_slug: string | null; spec_slug: string; stage_id: string; resource_id: string };
 
 // Returns the set of resource ids the user has completed within one
 // specialization. Stage-level "done" is derived from this on the
@@ -31,7 +31,7 @@ export async function getAllProgress(): Promise<ProgressRow[]> {
 
   const { data } = await supabase
     .from("user_progress")
-    .select("spec_slug, stage_id, resource_id")
+    .select("path_slug, spec_slug, stage_id, resource_id")
     .eq("user_id", user.id);
 
   return data ?? [];

@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const requestedNext = searchParams.get("next");
   const next = requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
     ? requestedNext
-    : "/paths";
+    : "/dashboard";
 
   console.info("OAuth callback received", {
     hasCode: Boolean(code),

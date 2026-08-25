@@ -65,6 +65,12 @@ export type TreeNode = {
   label: string;
   kind: "path" | "specialization" | "stage" | "topic" | "resource";
   url?: string;
+  progress?: {
+    pathSlug: string;
+    specSlug: string;
+    stageId: string;
+    resourceId: string;
+  };
   children?: TreeNode[];
 };
 
@@ -98,6 +104,12 @@ export function pathToTree(path: Path): TreeNode {
                     label: r.title ?? r.type,
                     kind: "resource",
                     url: r.url ?? undefined,
+                    progress: {
+                      pathSlug: path.slug,
+                      specSlug: spec.slug,
+                      stageId: stage.id,
+                      resourceId: r.id,
+                    },
                   })),
               })),
           })),
