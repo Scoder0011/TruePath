@@ -9,7 +9,7 @@ export default function Page() {
         <p className="text-lg mb-4">Have a question, suggestion, or want to contribute content to a path?</p>
 
         <a
-          href="https://discord.gg/CB94ah4T"
+          href="https://discord.gg/mhZX4NCv"
           className="inline-block bg-amber text-ink-deep dark:text-ink-deep font-medium px-4 py-2 rounded"
           rel="noopener noreferrer"
         >
