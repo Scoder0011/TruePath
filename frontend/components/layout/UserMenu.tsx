@@ -39,8 +39,9 @@ export default function UserMenu() {
       .from("profiles")
       .select("avatar_url, display_name")
       .eq("id", user.id)
-      .single()
-      .then(({ data }) => {
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) console.error("Failed to load the signed-in user's profile", error);
         setAvatarUrl(data?.avatar_url ?? null);
         setDisplayName(data?.display_name ?? null);
       });
