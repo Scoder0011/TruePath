@@ -6,13 +6,8 @@ import { createServerClient } from "@supabase/ssr";
 // every request, refreshes the token if needed, and keeps the cookie
 // in sync between the browser and server.
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (pathname.startsWith("/auth")) {
-    return NextResponse.next({ request });
-  }
 
   if (!url || !key) {
     console.error("Supabase middleware configuration is missing", {
@@ -50,5 +45,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!auth|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
