@@ -42,22 +42,37 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable} font-body bg-ink-deep text-white antialiased`}
       >
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/60 backdrop-blur-lg">
+        <header className="sticky top-0 z-50 border-b border-zinc-500/10 bg-black/20 backdrop-blur-xl">
           <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-6">
             <Link
               href="/"
               className="flex items-center gap-2.5 rounded-md focus-visible:outline-offset-4"
             >
               <Image src={logo} alt="TruePath" className="h-8 w-8" priority />
-              <span className="font-display text-lg font-bold tracking-tight">TruePath</span>
+              <span className="font-display text-lg font-bold tracking-tight text-white">TruePath</span>
             </Link>
             <div className="flex items-center gap-3 sm:gap-5">
               <Link
                 href="/paths"
-                className="rounded-md px-2 py-1.5 font-body text-sm text-ink-soft transition-colors hover:text-white"
+                className="rounded-md px-2 py-1.5 font-body text-sm text-zinc-300 transition-colors hover:text-white"
               >
                 Paths
               </Link>
+
+              <a
+                href="https://discord.gg/mhZX4NCv"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join our Discord community"
+                title="Join our Discord community"
+                className="group relative inline-flex items-center justify-center rounded-md border border-zinc-700/70 bg-white/5 p-2 text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+              >
+                <Image src="/icons/discord.png" alt="Discord" width={18} height={18} className="h-4.5 w-4.5" />
+                <span className="pointer-events-none absolute -top-11 right-0 hidden whitespace-nowrap rounded-md border border-white/10 bg-[#0f172a]/95 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-200 shadow-xl shadow-black/30 group-hover:block">
+                  Discord
+                </span>
+              </a>
+
               <UserMenu />
             </div>
           </nav>

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import AuthCard from "@/components/auth/AuthCard";
 
 const inputClass =
-  "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 backdrop-blur-md outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/60";
+  "w-full rounded-lg border border-zinc-700 bg-[#101214] px-4 py-2.5 font-body text-sm text-white placeholder:text-zinc-500 backdrop-blur-md outline-none transition-colors focus:border-zinc-400 focus:ring-2 focus:ring-zinc-700/40";
 
 // Reached only via the /auth/callback redirect after clicking the email
 // link — by the time this page renders, the callback route has already
@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
     <AuthCard title="Set a new password" subtitle="Make it something you'll remember this time.">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="password" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
+          <label htmlFor="password" className="mb-1.5 block font-body text-xs text-zinc-300">
             New password
           </label>
           <input
@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <div>
-          <label htmlFor="confirm" className="mb-1.5 block font-body text-xs text-gray-600 dark:text-ink-soft">
+          <label htmlFor="confirm" className="mb-1.5 block font-body text-xs text-zinc-300">
             Confirm password
           </label>
           <input
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-lg bg-white px-4 py-2.5 font-body text-sm font-medium text-black transition-opacity hover:bg-zinc-200 disabled:opacity-50"
         >
           {loading ? "Updating…" : "Update password"}
         </button>

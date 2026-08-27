@@ -28,7 +28,7 @@ export default function DomainSelector({
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 font-body text-sm text-gray-900 backdrop-blur-md transition-colors hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
       >
-        <span className="font-mono text-[10px] tracking-[0.15em] text-amber">PATHS</span>
+        <span className="font-mono text-[10px] tracking-[0.15em] text-route">PATHS</span>
         <span>{selected.name}</span>
         <span className={`transition-transform ${open ? "rotate-180" : ""}`}>⌄</span>
       </button>
@@ -46,7 +46,7 @@ export default function DomainSelector({
               }}
               className={`flex w-full items-center justify-between px-4 py-3 text-left font-body text-sm transition-colors ${
                 domain.slug === selected.slug
-                  ? "bg-gray-100 text-amber dark:bg-white/10"
+                  ? "bg-gray-100 text-route dark:bg-white/10"
                   : domain.available
                   ? "text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                   : "cursor-not-allowed text-gray-400 dark:text-ink-soft/50"

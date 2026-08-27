@@ -69,7 +69,7 @@ export default function NavbarClient() {
         <div className="flex items-center gap-3 sm:gap-5">
           <Link
             href="/paths"
-            className="rounded-full px-3 py-1.5 font-body text-sm text-amber bg-amber/5 hover:bg-amber/10 transition-colors"
+            className="rounded-full px-3 py-1.5 font-body text-sm text-route bg-route/5 hover:bg-route/10 transition-colors"
           >
             Paths
           </Link>
@@ -80,7 +80,7 @@ export default function NavbarClient() {
             rel="noopener noreferrer"
             aria-label="Join our Discord"
             title="Join our Discord"
-            className="inline-flex items-center rounded-md p-1 text-sm font-body text-amber hover:bg-amber/10 transition-colors"
+            className="inline-flex items-center rounded-md p-1 text-sm font-body text-route hover:bg-route/10 transition-colors"
           >
             <Image
               src="/icons/discord.png"
@@ -110,7 +110,7 @@ export default function NavbarClient() {
                   />
                 ) : (
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber/20 ring-1 ring-amber/30">
-                    <span className="font-mono text-xs font-medium text-amber">
+                    <span className="font-mono text-xs font-medium text-route">
                       {initial}
                     </span>
                   </div>

@@ -80,11 +80,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-6 py-12 dark:bg-ink-deep">
+    <main className="min-h-screen bg-[#f7f7f5] px-6 py-12 text-zinc-900">
       <div className="mx-auto max-w-2xl space-y-8">
         <div>
-          <p className="font-mono text-xs tracking-[0.15em] text-amber">SETTINGS</p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="font-mono text-xs tracking-[0.15em] text-route">SETTINGS</p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-zinc-900">
             Account settings
           </h1>
         </div>
@@ -98,12 +98,12 @@ export default function SettingsPage() {
         )}
 
         {/* Profile picture */}
-        <section className="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-white/10 dark:bg-white/5">
-          <h2 className="font-display text-lg font-semibold text-gray-900 dark:text-white">
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="font-display text-lg font-semibold text-zinc-900">
             Profile picture
           </h2>
           <div className="mt-4 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-gray-100 font-display text-xl text-gray-500 dark:border-white/10 dark:bg-white/10 dark:text-ink-soft">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 font-display text-xl text-zinc-500">
               {avatarPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
@@ -111,7 +111,7 @@ export default function SettingsPage() {
                 (displayName || email || "?").slice(0, 1).toUpperCase()
               )}
             </div>
-            <label className="cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 font-body text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
+            <label className="cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 font-body text-sm text-zinc-700 transition-colors hover:bg-zinc-100">
               Upload new picture
               <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </label>
@@ -121,9 +121,9 @@ export default function SettingsPage() {
         {/* Profile info */}
         <form
           onSubmit={handleSaveProfile}
-          className="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-white/10 dark:bg-white/5"
+          className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
         >
-          <h2 className="font-display text-lg font-semibold text-gray-900 dark:text-white">Profile</h2>
+          <h2 className="font-display text-lg font-semibold text-zinc-900">Profile</h2>
           <div className="mt-4 space-y-4">
             <div>
               <label className="mb-1.5 block font-body text-xs text-gray-500 dark:text-ink-soft">
@@ -156,9 +156,9 @@ export default function SettingsPage() {
         {/* Password */}
         <form
           onSubmit={handleChangePassword}
-          className="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-white/10 dark:bg-white/5"
+          className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
         >
-          <h2 className="font-display text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="font-display text-lg font-semibold text-zinc-900">
             Change password
           </h2>
           <div className="mt-4 space-y-4">

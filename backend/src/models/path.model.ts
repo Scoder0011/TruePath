@@ -3,7 +3,20 @@ import { supabase } from '../config/supabase';
 export async function getAllPaths() {
   const { data, error } = await supabase
     .from('paths')
-    .select('*')
+    .select(`
+      *,
+      specializations (
+        *,
+        stages (
+          *,
+          topics (
+            *,
+            resources (*)
+          ),
+          notes (*)
+        )
+      )
+    `)
     .order('order_index', { ascending: true });
 
   if (error) throw error;

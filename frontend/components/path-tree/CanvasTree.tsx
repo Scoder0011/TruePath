@@ -12,7 +12,7 @@ type Position = { x: number; y: number };
 type Edge = { x1: number; y1: number; x2: number; y2: number };
 
 const kindColor: Record<TreeNode["kind"], string> = {
-  path: "border-amber text-amber",
+  path: "border-route text-route",
   specialization: "border-route text-route",
   stage: "border-gray-300 text-gray-800 dark:border-white/20 dark:text-white",
   topic: "border-gray-200 text-gray-700 dark:border-white/10 dark:text-ink-soft",

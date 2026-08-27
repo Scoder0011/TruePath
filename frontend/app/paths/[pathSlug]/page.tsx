@@ -174,7 +174,7 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
       <div className="space-y-5">
         {info.kind !== "topic" && info.kind !== "resource" && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">
               {info.kind === "path" ? "OVERVIEW" : info.kind === "specialization" ? "DESCRIPTION" : "STAGE"}
             </p>
             <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
@@ -186,7 +186,7 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
 
         {info.kind === "topic" && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">TOPIC</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">TOPIC</p>
             <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
             {info.description && <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.description}</p>}
           </div>
@@ -194,7 +194,7 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
 
         {info.kind === "resource" && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCE</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">RESOURCE</p>
             <h2 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">{info.title}</h2>
             {info.typeLabel && (
               <div className="mt-3 flex items-center gap-2">
@@ -230,21 +230,21 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
           <>
             {info.prerequisites && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">PREREQUISITES</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">PREREQUISITES</p>
                 <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.prerequisites}</p>
               </div>
             )}
 
             {info.duration && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">DURATION</p>
                 <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.duration}</p>
               </div>
             )}
 
             {info.career_outcomes && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER OUTCOMES</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">CAREER OUTCOMES</p>
                 <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{info.career_outcomes}</p>
               </div>
             )}
@@ -253,7 +253,7 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
 
         {info.kind === "topic" && info.resources && info.resources.length > 0 && (
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">RESOURCES</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">RESOURCES</p>
             <div className="mt-3 space-y-3">
               {info.resources.map((resource) => (
                 <a
@@ -292,42 +292,42 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
   };
 
   return (
-    <main className="h-screen overflow-hidden bg-white text-gray-900 dark:bg-ink-deep dark:text-white">
+    <main className="h-screen overflow-hidden bg-[#f7f7f5] text-zinc-900">
       <div className="relative flex h-screen flex-col md:flex-row">
         <button
           type="button"
           onClick={() => setSidebarOpen((current) => !current)}
-          className="absolute left-4 top-4 z-20 rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-soft md:hidden"
+          className="absolute left-4 top-4 z-20 rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-700 md:hidden"
         >
           {sidebarOpen ? "Hide info" : "Path info"}
         </button>
 
         <aside
           className={[
-            "z-10 h-full w-full border-r border-gray-200 bg-gray-50/80 backdrop-blur-xl md:w-[280px] md:shrink-0 dark:border-white/10 dark:bg-white/5",
+            "z-10 h-full w-full border-r border-zinc-200 bg-[#f5f5f4] backdrop-blur-xl md:w-[280px] md:shrink-0",
             sidebarOpen ? "absolute inset-y-0 left-0 flex" : "hidden md:flex",
           ].join(" ")}
         >
           <div className="flex min-h-0 w-full flex-col">
             <div className="px-4 pb-3 pt-4">
-              <Link href="/paths" className="font-mono text-xs text-gray-600 transition-opacity hover:opacity-80 dark:text-ink-soft">
+              <Link href="/paths" className="font-mono text-xs text-zinc-600 transition-opacity hover:opacity-80">
                 ← Back to all paths
               </Link>
 
               <div className="mt-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">CAREER PATH</p>
-                <h1 className="mt-2 font-display text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">CAREER PATH</p>
+                <h1 className="mt-2 font-display text-2xl font-bold text-zinc-900">
                   {path?.title ?? "Loading..."}
                 </h1>
               </div>
 
-              <div className="mt-4 border-t border-gray-200 dark:border-white/10" />
+              <div className="mt-4 border-t border-zinc-200" />
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 pb-6">
               {loading && (
                 <div className="flex min-h-[220px] items-center justify-center">
-                  <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">Loading path details…</p>
+                  <p className="font-mono text-sm text-zinc-600">Loading path details…</p>
                 </div>
               )}
 
@@ -344,8 +344,8 @@ export default function PathDetailPage({ params }: { params: { pathSlug: string 
 
         <div className="relative h-screen flex-1 overflow-hidden">
           {loading && (
-            <div className="flex h-full items-center justify-center border-l border-gray-200 bg-gray-100/80 dark:border-white/10 dark:bg-ink-deep/70">
-              <p className="font-mono text-sm text-gray-600 dark:text-ink-soft">Loading path timeline…</p>
+            <div className="flex h-full items-center justify-center border-l border-zinc-200 bg-zinc-100/80">
+              <p className="font-mono text-sm text-zinc-600">Loading path timeline…</p>
             </div>
           )}
 

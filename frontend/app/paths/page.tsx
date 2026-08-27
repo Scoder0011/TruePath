@@ -362,9 +362,9 @@ export default function PathsPage() {
   }, [activeTree, hoveredTeamId, visibleSpec]);
 
   const teamToneClasses: Record<string, string> = {
-    "red-team": "border-red-300/80 bg-red-50 text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200",
-    "blue-team": "border-blue-300/80 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200",
-    "purple-team": "border-violet-300/80 bg-violet-50 text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200",
+    "red-team": "border-red-200 bg-red-50 text-red-700",
+    "blue-team": "border-blue-200 bg-blue-50 text-blue-700",
+    "purple-team": "border-violet-200 bg-violet-50 text-violet-700",
   };
 
   const handlePathChange = (slug: string) => {
@@ -382,11 +382,11 @@ export default function PathsPage() {
   };
 
   return (
-    <main className="flex h-screen overflow-hidden bg-white text-gray-900 dark:bg-ink-deep dark:text-white">
+    <main className="flex h-screen overflow-hidden bg-[#f7f7f5] text-zinc-900">
       <div className="flex h-full w-full flex-row">
-        <aside className="border-r border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-ink-deep lg:w-[18%] lg:p-4">
+        <aside className="border-r border-zinc-200 bg-[#f5f5f4] p-3 lg:w-[18%] lg:p-4">
           <div className="mb-4 lg:mb-6">
-            <p className="font-mono text-[10px] tracking-[0.2em] text-amber">PATHS</p>
+            <p className="font-mono text-[10px] tracking-[0.2em] text-route">PATHS</p>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
@@ -431,13 +431,13 @@ export default function PathsPage() {
             </div>
           </div>
 
-          <div className="border-b border-gray-200 bg-white px-4 py-4 dark:border-white/10 dark:bg-ink-deep lg:px-6">
+          <div className="border-b border-zinc-200 bg-white px-4 py-4 lg:px-6">
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search paths..."
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 font-body text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-amber/50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-ink-soft/50"
+              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 font-body text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-400"
             />
           </div>
 
@@ -497,10 +497,10 @@ export default function PathsPage() {
                                 className={[
                                   "flex w-full items-center justify-between gap-3 rounded-lg border-l px-3 py-2 text-left transition-all duration-200",
                                   isSelected
-                                    ? "border-l-2 border-amber bg-gray-100 text-gray-900 dark:bg-white/8 dark:text-white"
+                                    ? "border-l-2 border-amber bg-zinc-100 text-zinc-900"
                                     : isHovered
-                                      ? "bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white"
-                                      : "border-l border-transparent bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-ink-soft dark:hover:bg-white/5 dark:hover:text-white",
+                                      ? "bg-zinc-100 text-zinc-900"
+                                      : "border-l border-transparent bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
                                 ].join(" ")}
                               >
                                 <div className="flex min-w-0 items-center gap-2">
@@ -537,12 +537,12 @@ export default function PathsPage() {
 
         <aside
           className={[
-            "fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white p-4 shadow-2xl shadow-gray-200/60 transition-transform duration-200 dark:border-white/10 dark:bg-ink-deep dark:shadow-ink-deep/60 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
+            "fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200 bg-white p-4 shadow-2xl shadow-zinc-200/60 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
             sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)] lg:translate-y-0",
           ].join(" ")}
         >
           <div className="mb-3 flex items-center justify-between lg:hidden">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-amber">Details</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-route">Details</p>
             <button type="button" onClick={() => setSheetOpen(false)} className="font-body text-sm text-gray-600 dark:text-ink-soft">
               Close
             </button>
@@ -550,9 +550,9 @@ export default function PathsPage() {
 
           <div className="h-full overflow-y-auto">
             {!visibleSpec && !visibleTeam && (
-              <div className="flex min-h-[220px] flex-col justify-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-white/10 dark:bg-white/[0.02]">
-                <h2 className="font-display text-lg text-gray-900 dark:text-white">Explore a path</h2>
-                <p className="font-body text-sm text-gray-600 dark:text-ink-soft">Hover to preview, click to lock the details here.</p>
+              <div className="flex min-h-[220px] flex-col justify-center gap-4 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
+                <h2 className="font-display text-lg text-zinc-900">Explore a path</h2>
+                <p className="font-body text-sm text-zinc-600">Hover to preview, click to lock the details here.</p>
                 <div className="flex flex-wrap gap-2">
                   <span className="rounded-full border border-route/20 bg-route/10 px-3 py-1 text-xs text-route">Penetration Testing</span>
                 </div>
@@ -563,23 +563,23 @@ export default function PathsPage() {
               <div className="space-y-5">
                 <div className={[
                   "inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em]",
-                  teamToneClasses[visibleTeam.id] ?? "border-gray-200 bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-white",
+                  teamToneClasses[visibleTeam.id] ?? "border-zinc-200 bg-zinc-100 text-zinc-700",
                 ].join(" ")}>
                   {visibleTeam.id.replace("-", " ").toUpperCase()}
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900 dark:text-white">{visibleTeam.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{visibleTeam.description}</p>
+                  <h2 className="font-display text-xl font-bold text-zinc-900">{visibleTeam.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-zinc-600">{visibleTeam.description}</p>
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">Specializations</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">Specializations</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {visibleTeam.specializations.map((specialization) => (
                       <span
                         key={specialization.id}
-                        className="rounded-full border border-gray-200 bg-gray-100 px-2 py-1 font-body text-[11px] text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-soft"
+                        className="rounded-full border border-zinc-200 bg-zinc-100 px-2 py-1 font-body text-[11px] text-zinc-700"
                       >
                         {specialization.label}
                       </span>
@@ -595,7 +595,7 @@ export default function PathsPage() {
                   "inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em]",
                   teamToneClasses[
                     activeTree.find((team) => team.specializations.some((specialization) => specialization.id === visibleSpec.id))?.id ?? ""
-                  ] ?? "border-gray-200 bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-white",
+                  ] ?? "border-zinc-200 bg-zinc-100 text-zinc-700",
                 ].join(" ")}>
                   {activeTree
                     .find((team) => team.specializations.some((specialization) => specialization.id === visibleSpec.id))
@@ -604,29 +604,29 @@ export default function PathsPage() {
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900 dark:text-white">{visibleSpec.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{visibleSpec.description}</p>
+                  <h2 className="font-display text-xl font-bold text-zinc-900">{visibleSpec.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-zinc-600">{visibleSpec.description}</p>
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">WHO IT&apos;S FOR:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{visibleSpec.whoFor}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">WHO IT&apos;S FOR:</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-zinc-600">{visibleSpec.whoFor}</p>
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber">DURATION:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-gray-600 dark:text-ink-soft">{visibleSpec.duration}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">DURATION:</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-zinc-600">{visibleSpec.duration}</p>
                 </div>
 
                 {visibleSpec.status === "active" ? (
                   <Link
                     href={`/paths/${activePath.slug}/${visibleSpec.slug}`}
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90"
+                    className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 font-body text-sm font-medium text-white transition-opacity hover:bg-zinc-800"
                   >
                     Start this path <span aria-hidden="true">→</span>
                   </Link>
                 ) : (
-                  <p className="font-body text-sm text-gray-600 dark:text-ink-soft">Coming soon — roadmap in progress</p>
+                  <p className="font-body text-sm text-zinc-600">Coming soon — roadmap in progress</p>
                 )}
               </div>
             )}
