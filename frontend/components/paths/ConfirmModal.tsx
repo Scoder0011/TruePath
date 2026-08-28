@@ -22,22 +22,22 @@ export default function ConfirmModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl"
+        className="w-full max-w-sm rounded-2xl border border-zinc-700 bg-[#0b0b0b] p-6 shadow-2xl"
       >
-        <h3 className="font-display text-lg font-semibold text-zinc-900">{title}</h3>
-        <p className="mt-2 font-body text-sm text-zinc-600">{message}</p>
+        <h3 className="font-display text-lg font-semibold text-white">{title}</h3>
+        <p className="mt-2 font-body text-sm text-zinc-400">{message}</p>
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg px-4 py-2 font-body text-sm text-zinc-600 transition-colors hover:bg-zinc-100"
+            className="rounded-lg px-4 py-2 font-body text-sm text-zinc-400 transition-colors hover:bg-zinc-900"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-lg bg-black px-4 py-2 font-body text-sm font-medium text-white transition-opacity hover:bg-zinc-800"
+            className="rounded-lg bg-blue-600 px-4 py-2 font-body text-sm font-medium text-white transition-opacity hover:bg-blue-500"
           >
             {confirmLabel}
           </button>

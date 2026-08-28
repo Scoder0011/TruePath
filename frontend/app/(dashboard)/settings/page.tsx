@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getProfile, updateProfile, uploadAvatar } from "@/lib/supabase/profile";
 
 const inputClass =
-  "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 font-body text-sm text-gray-900 outline-none transition-colors focus:border-amber dark:border-white/10 dark:bg-white/5 dark:text-white";
+  "w-full rounded-lg border border-zinc-700 bg-black px-4 py-2.5 font-body text-sm text-white outline-none transition-colors placeholder:text-zinc-500 focus:border-blue-400 focus:ring-1 focus:ring-blue-400";
 
 export default function SettingsPage() {
   const [email, setEmail] = useState("");
@@ -80,30 +80,33 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f7f5] px-6 py-12 text-zinc-900">
-      <div className="mx-auto max-w-2xl space-y-8">
+    <main className="settings-shell dashboard-shell relative min-h-screen overflow-hidden bg-[#070b14] px-6 py-12 text-white">
+      <div className="dashboard-stars" aria-hidden="true" />
+      <div className="dashboard-stars dashboard-stars-delayed" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-2xl space-y-8">
         <div>
-          <p className="font-mono text-xs tracking-[0.15em] text-route">SETTINGS</p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-zinc-900">
+          <a href="/dashboard" className="font-mono text-xs tracking-[0.12em] text-blue-300 hover:text-white">← BACK TO DASHBOARD</a>
+          <p className="mt-8 font-mono text-xs tracking-[0.15em] text-zinc-400">SETTINGS</p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-white">
             Account settings
           </h1>
         </div>
 
         {status && (
           <p
-            className={`font-body text-sm ${status.type === "success" ? "text-route" : "text-red-500"}`}
+            className={`font-body text-sm ${status.type === "success" ? "text-route" : "text-red-300"}`}
           >
             {status.message}
           </p>
         )}
 
         {/* Profile picture */}
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="font-display text-lg font-semibold text-zinc-900">
+        <section className="rounded-2xl border border-zinc-700 bg-[#0b0b0b] p-6 shadow-sm">
+          <h2 className="font-display text-lg font-semibold text-white">
             Profile picture
           </h2>
           <div className="mt-4 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 font-display text-xl text-zinc-500">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-zinc-600 bg-zinc-900 font-display text-xl text-zinc-400">
               {avatarPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarPreview} alt="" className="h-full w-full object-cover" />
@@ -111,7 +114,7 @@ export default function SettingsPage() {
                 (displayName || email || "?").slice(0, 1).toUpperCase()
               )}
             </div>
-            <label className="cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 font-body text-sm text-zinc-700 transition-colors hover:bg-zinc-100">
+            <label className="cursor-pointer rounded-lg border border-zinc-600 bg-blue-600 px-4 py-2 font-body text-sm text-white transition-colors hover:bg-blue-500">
               Upload new picture
               <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
             </label>
@@ -121,12 +124,12 @@ export default function SettingsPage() {
         {/* Profile info */}
         <form
           onSubmit={handleSaveProfile}
-          className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-zinc-700 bg-[#0b0b0b] p-6 shadow-sm"
         >
-          <h2 className="font-display text-lg font-semibold text-zinc-900">Profile</h2>
+          <h2 className="font-display text-lg font-semibold text-white">Profile</h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label className="mb-1.5 block font-body text-xs text-gray-500 dark:text-ink-soft">
+              <label className="mb-1.5 block font-body text-xs text-zinc-400">
                 Display name
               </label>
               <input
@@ -138,7 +141,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block font-body text-xs text-gray-500 dark:text-ink-soft">
+              <label className="mb-1.5 block font-body text-xs text-zinc-400">
                 Email
               </label>
               <input type="email" value={email} disabled className={`${inputClass} cursor-not-allowed opacity-60`} />
@@ -146,7 +149,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={savingProfile}
-              className="rounded-lg bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-lg bg-blue-600 px-4 py-2.5 font-body text-sm font-medium text-white transition-opacity hover:bg-blue-500 disabled:opacity-50"
             >
               {savingProfile ? "Saving…" : "Save profile"}
             </button>
@@ -156,14 +159,14 @@ export default function SettingsPage() {
         {/* Password */}
         <form
           onSubmit={handleChangePassword}
-          className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-zinc-700 bg-[#0b0b0b] p-6 shadow-sm"
         >
-          <h2 className="font-display text-lg font-semibold text-zinc-900">
+          <h2 className="font-display text-lg font-semibold text-white">
             Change password
           </h2>
           <div className="mt-4 space-y-4">
             <div>
-              <label className="mb-1.5 block font-body text-xs text-gray-500 dark:text-ink-soft">
+              <label className="mb-1.5 block font-body text-xs text-zinc-400">
                 New password
               </label>
               <input
@@ -177,7 +180,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block font-body text-xs text-gray-500 dark:text-ink-soft">
+              <label className="mb-1.5 block font-body text-xs text-zinc-400">
                 Confirm new password
               </label>
               <input
@@ -192,7 +195,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={savingPassword}
-              className="rounded-lg bg-amber px-4 py-2.5 font-body text-sm font-medium text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-lg bg-blue-600 px-4 py-2.5 font-body text-sm font-medium text-white transition-opacity hover:bg-blue-500 disabled:opacity-50"
             >
               {savingPassword ? "Updating…" : "Update password"}
             </button>

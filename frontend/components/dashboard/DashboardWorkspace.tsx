@@ -100,41 +100,43 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f7f5] px-4 py-8 text-zinc-900 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        <header className="flex flex-col gap-5 border-b border-zinc-200 pb-8 md:flex-row md:items-end md:justify-between">
+    <main className="dashboard-shell relative min-h-screen overflow-hidden bg-[#070b14] px-4 py-8 text-zinc-900 sm:px-6 lg:px-10">
+      <div className="dashboard-stars" aria-hidden="true" />
+      <div className="dashboard-stars dashboard-stars-delayed" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <header className="flex flex-col gap-5 border-b border-white/15 pb-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="font-mono text-xs tracking-[0.18em] text-route">YOUR LEARNING CONSOLE</p>
-            <h1 className="mt-2 font-display text-3xl font-bold text-zinc-900">Welcome back, {userName}</h1>
-            <p className="mt-2 max-w-xl font-body text-sm text-zinc-600">Choose a domain and keep building your next capability.</p>
+            <p className="font-mono text-sm tracking-[0.18em] text-emerald-200">YOUR LEARNING CONSOLE</p>
+            <h1 className="mt-2 font-display text-3xl font-bold text-white">Welcome back, {userName}</h1>
+            <p className="mt-2 max-w-xl font-body text-sm text-slate-300">Choose a domain and keep building your next capability.</p>
           </div>
-          <label className="flex w-full items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 md:max-w-sm">
-            <span className="font-mono text-lg text-route">⌕</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search domains and paths" className="w-full bg-transparent font-body text-sm text-zinc-900 outline-none placeholder:text-zinc-400" />
+          <label className="flex w-full items-center gap-3 rounded-xl border border-slate-600 bg-black px-4 py-3 transition-colors focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 md:max-w-sm">
+            <span className="font-mono text-lg text-white">⌕</span>
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search domains and paths" className="w-full bg-transparent font-body text-sm text-white outline-none placeholder:text-slate-200 focus:outline-none" />
           </label>
         </header>
 
         {error && <p className="mt-4 rounded-lg border border-route/40 bg-route/10 px-4 py-3 font-body text-sm text-route">{error}</p>}
 
         <section className="mt-8">
-          <div className="flex items-center justify-between gap-4"><h2 className="font-display text-xl font-semibold text-zinc-900">In progress</h2><Link href="/paths" className="font-body text-sm text-route hover:underline">Browse all paths</Link></div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{loading && <div className="rounded-xl border border-zinc-200 bg-white px-5 py-6 font-body text-sm text-zinc-600 md:col-span-2 lg:col-span-3" role="status">Loading your paths...</div>}{inProgress.map(({ path, spec }) => <ProgressCard key={`${path.slug}-${spec.slug}`} path={path} spec={spec} progress={progress} />)}{!loading && !inProgress.length && <div className="rounded-xl border border-dashed border-zinc-300 bg-white px-5 py-6 md:col-span-2 lg:col-span-3"><p className="font-display text-base font-semibold text-zinc-900">No path currently underway</p><p className="mt-2 font-body text-sm text-zinc-600">Start any roadmap or pathway and your progress will appear here.</p><Link href="/paths" className="mt-4 inline-block font-body text-sm font-medium text-route hover:underline">Browse pathways <span aria-hidden="true">→</span></Link></div>}</div>
+          <div className="flex items-center justify-between gap-4"><h2 className="font-display text-xl font-semibold text-white">In progress</h2><Link href="/paths" className="font-body text-sm text-blue-300 hover:text-white hover:underline">Browse all paths</Link></div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{loading && <div className="rounded-xl border border-slate-600 bg-[#0b0b0b] px-5 py-6 font-body text-sm text-slate-300 md:col-span-2 lg:col-span-3" role="status">Loading your paths...</div>}{inProgress.map(({ path, spec }) => <ProgressCard key={`${path.slug}-${spec.slug}`} path={path} spec={spec} progress={progress} />)}{!loading && !inProgress.length && <div className="rounded-xl border border-dashed border-slate-600 bg-[#0b0b0b] px-5 py-6 md:col-span-2 lg:col-span-3"><p className="font-display text-base font-semibold text-white">No path currently underway</p><p className="mt-2 font-body text-sm text-slate-300">Start any roadmap or pathway and your progress will appear here.</p><Link href="/paths" className="mt-4 inline-block font-body text-sm font-medium text-blue-300 hover:text-white hover:underline">Browse pathways <span aria-hidden="true">→</span></Link></div>}</div>
         </section>
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-[10px] tracking-[0.18em] text-route">DOMAIN MAP</p>
+              <p className="font-mono text-[10px] tracking-[0.18em] text-slate-400">DOMAIN MAP</p>
               <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-2">
-                <h2 className="font-display text-xl font-semibold text-zinc-900">Explore</h2>
-                <div className="flex gap-1 overflow-x-auto rounded-lg bg-zinc-100 p-1">
+                <h2 className="font-display text-xl font-semibold text-white">Explore</h2>
+                <div className="flex gap-1 overflow-x-auto rounded-lg border border-white/10 bg-black/70 p-1">
                   {DOMAINS.map((domain) => (
                     <button
                       key={domain.slug}
                       type="button"
                       disabled={!domain.available}
                       onClick={() => domain.available && requestDomain(domain.slug)}
-                      className={`whitespace-nowrap rounded-md px-3 py-1.5 font-body text-xs transition-colors ${domain.slug === "cybersecurity" ? "bg-white font-medium text-zinc-900 shadow-sm" : "text-zinc-500"} ${!domain.available ? "cursor-not-allowed opacity-40" : ""}`}
+                      className={`whitespace-nowrap rounded-md border px-3 py-1.5 font-body text-xs transition-colors ${domain.slug === "cybersecurity" ? "border-zinc-500 bg-black font-medium text-white shadow-sm" : "border-transparent bg-black text-zinc-400 hover:border-white/20 hover:text-white"} ${!domain.available ? "cursor-not-allowed opacity-40" : ""}`}
                     >
                       {domain.name}
                     </button>
@@ -144,21 +146,21 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
             </div>
           </div>
 
-          <div className="relative mt-5 overflow-hidden rounded-2xl border border-zinc-200 bg-white px-4 py-8 sm:px-8">
+          <div className="relative mt-5 overflow-hidden rounded-2xl border border-zinc-700 bg-[#0b0b0b] px-4 py-8 sm:px-8">
             <div className="relative mx-auto max-w-3xl">
-              <Link href="/paths" className="relative z-10 mx-auto flex min-h-24 max-w-xs flex-col items-center justify-center rounded-xl border-2 border-amber/60 bg-[#fffaf0] px-5 py-4 text-center shadow-sm transition-transform hover:-translate-y-1">
-                <span className="font-mono text-[10px] tracking-[0.18em] text-route">DOMAIN</span>
-                <span className="mt-1 font-display text-lg font-semibold text-zinc-900">Cybersecurity</span>
-                <span className="mt-1 font-body text-xs text-zinc-600">Protect systems, networks, and data.</span>
+              <Link href="/paths" className="relative z-10 mx-auto flex min-h-24 max-w-xs flex-col items-center justify-center rounded-xl border-2 border-zinc-600 bg-[#111111] px-5 py-4 text-center shadow-sm transition-transform hover:-translate-y-1 hover:border-zinc-400">
+                <span className="font-mono text-[10px] tracking-[0.18em] text-slate-400">DOMAIN</span>
+                <span className="mt-1 font-display text-lg font-semibold text-white">Cybersecurity</span>
+                <span className="mt-1 font-body text-xs text-slate-300">Protect systems, networks, and data.</span>
               </Link>
 
               <div className="mt-12 grid gap-4 md:grid-cols-3">
                 {CYBERSECURITY_TREE.map((team) => (
-                  <Link key={team.id} href={`/dashboard/teams/${team.id}`} className="relative z-10 flex min-h-32 flex-col rounded-xl border border-zinc-200 bg-[#f7f7f5] p-4 transition-all hover:-translate-y-1 hover:border-zinc-400 hover:shadow-md">
+                  <Link key={team.id} href={`/dashboard/teams/${team.id}`} className={`relative z-10 flex min-h-32 flex-col rounded-xl border bg-[#111111] p-4 transition-all hover:-translate-y-1 hover:shadow-md ${team.id === "red-team" ? "border-red-400/50 hover:border-red-300" : "border-slate-600 hover:border-slate-400"}`}>
                     <span className="text-xl" aria-hidden="true">{team.icon}</span>
-                    <span className="mt-2 font-display text-sm font-semibold text-zinc-900">{team.label}</span>
-                    <span className="mt-1 line-clamp-2 font-body text-xs leading-5 text-zinc-600">{team.description}</span>
-                    <span className="mt-auto pt-3 font-mono text-[10px] tracking-[0.12em] text-route">VIEW SPECIALIZATIONS →</span>
+                    <span className="mt-2 font-display text-sm font-semibold text-white">{team.label}</span>
+                    <span className="mt-1 line-clamp-2 font-body text-xs leading-5 text-slate-300">{team.description}</span>
+                    <span className={`mt-auto pt-3 font-mono text-[10px] tracking-[0.12em] ${team.id === "red-team" ? "text-red-300" : "text-blue-300"}`}>VIEW SPECIALIZATIONS →</span>
                   </Link>
                 ))}
               </div>
@@ -166,7 +168,7 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
           </div>
         </section>
 
-        {selectedSlug && <section className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 bg-white"><div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4"><div><p className="font-mono text-[10px] tracking-[0.15em] text-route">ROADMAP VIEW</p><h2 className="mt-1 font-display text-xl font-semibold text-zinc-900">{selectedPath?.title ?? "Loading roadmap"}</h2></div><button onClick={closeRoadmap} className="font-mono text-xs text-zinc-500 hover:text-route">CLOSE</button></div><div className="h-[620px]">{loadingTree ? <p className="p-6 font-body text-sm text-zinc-600">Loading roadmap...</p> : selectedPath ? <CanvasTree root={pathToTree(selectedPath)} completedResourceIds={completedIds} onResourceToggle={toggleResource} lockedNodeIds={mode === "staged" ? getLockedStageIds(selectedPath, progress) : new Set()} /> : <p className="p-6 font-body text-sm text-zinc-600">No roadmap data is available for this domain yet.</p>}</div></section>}
+        {selectedSlug && <section className="mt-8 overflow-hidden rounded-2xl border border-zinc-700 bg-[#0b0b0b]"><div className="flex items-center justify-between border-b border-zinc-700 px-5 py-4"><div><p className="font-mono text-[10px] tracking-[0.15em] text-route">ROADMAP VIEW</p><h2 className="mt-1 font-display text-xl font-semibold text-white">{selectedPath?.title ?? "Loading roadmap"}</h2></div><button onClick={closeRoadmap} className="font-mono text-xs text-slate-300 hover:text-route">CLOSE</button></div><div className="h-[620px]">{loadingTree ? <p className="p-6 font-body text-sm text-slate-300">Loading roadmap...</p> : selectedPath ? <CanvasTree root={pathToTree(selectedPath)} completedResourceIds={completedIds} onResourceToggle={toggleResource} lockedNodeIds={mode === "staged" ? getLockedStageIds(selectedPath, progress) : new Set()} /> : <p className="p-6 font-body text-sm text-slate-300">No roadmap data is available for this domain yet.</p>}</div></section>}
         {pendingDomain && <ModeSelectModal onSelect={handleModeSelect} />}
       </div>
     </main>
@@ -178,7 +180,10 @@ function ProgressCard({ path, spec, progress }: { path: Path; spec: NonNullable<
   const total = (spec.stages ?? []).reduce((sum, stage) => sum + (stage.topics ?? []).reduce((topicSum, topic) => topicSum + (topic.resources ?? []).length, 0), 0);
   const percent = total ? Math.min(100, Math.round((completed / total) * 100)) : 0;
   const team = CYBERSECURITY_TREE.find((item) => item.specializations.some((specialization) => specialization.slug === spec.slug));
-  return <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] tracking-[0.15em] text-route">PATHWAY</p><p className="mt-1 font-body text-xs text-zinc-500">{path.title} <span aria-hidden="true">›</span> {team?.label ?? "Team"} <span aria-hidden="true">›</span></p><Link href={`/paths/${path.slug}/${spec.slug}`} className="mt-1 block font-display text-lg font-semibold text-zinc-900 hover:text-route">{spec.title}</Link></div><span className="rounded-full border border-route/50 px-2 py-1 font-mono text-[10px] text-route">{percent === 100 ? "BADGE EARNED" : `${percent}%`}</span></div><p className="mt-2 line-clamp-2 font-body text-sm text-zinc-600">{spec.description ?? "Continue building this capability."}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-200"><div className="h-full bg-route transition-all" style={{ width: `${percent}%` }} /></div><Link href={`/paths/${path.slug}/${spec.slug}`} className="mt-4 inline-block font-body text-sm font-medium text-route hover:underline">{completed ? "Continue path" : "Open pathway"} <span aria-hidden="true">→</span></Link></article>;
+  const isRedTeam = team?.id === "red-team";
+  const interactiveClass = isRedTeam ? "text-red-300 hover:text-white" : "text-blue-300 hover:text-white";
+  const borderClass = team?.id === "red-team" ? "border-red-400/50" : team?.id === "blue-team" ? "border-blue-400/50" : team?.id === "purple-team" ? "border-purple-400/50" : "border-slate-600";
+  return <article className={`rounded-2xl border bg-[#0b0b0b] p-5 shadow-sm ${borderClass}`}><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] tracking-[0.15em] text-slate-400">PATHWAY</p><p className="mt-1 font-body text-xs text-slate-400">{path.title} <span aria-hidden="true">›</span> {team?.label ?? "Team"} <span aria-hidden="true">›</span></p><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-1 block font-display text-lg font-semibold ${interactiveClass}`}>{spec.title}</Link></div><span className="rounded-full border border-route/50 px-2 py-1 font-mono text-[10px] text-route">{percent === 100 ? "BADGE EARNED" : `${percent}%`}</span></div><p className="mt-2 line-clamp-2 font-body text-sm text-slate-300">{spec.description ?? "Continue building this capability."}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-800"><div className="h-full bg-route transition-all" style={{ width: `${percent}%` }} /></div><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-4 inline-block font-body text-sm font-medium ${interactiveClass}`}>{completed ? "Continue path" : "Open pathway"} <span aria-hidden="true">→</span></Link></article>;
 }
 
 function getLockedStageIds(path: Path, progress: ProgressRow[]) {

@@ -326,9 +326,9 @@ export default function PathsPage() {
   const [activePathSlug, setActivePathSlug] = useState("cybersecurity");
   const [search, setSearch] = useState("");
   const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({
-    "red-team": true,
-    "blue-team": true,
-    "purple-team": true,
+    "red-team": false,
+    "blue-team": false,
+    "purple-team": false,
   });
   const [hoveredSpec, setHoveredSpec] = useState<SpecializationItem | null>(null);
   const [selectedSpec, setSelectedSpec] = useState<SpecializationItem | null>(null);
@@ -362,9 +362,9 @@ export default function PathsPage() {
   }, [activeTree, hoveredTeamId, visibleSpec]);
 
   const teamToneClasses: Record<string, string> = {
-    "red-team": "border-red-200 bg-red-50 text-red-700",
-    "blue-team": "border-blue-200 bg-blue-50 text-blue-700",
-    "purple-team": "border-violet-200 bg-violet-50 text-violet-700",
+    "red-team": "border-red-400/40 bg-red-950/30 text-red-200",
+    "blue-team": "border-blue-400/40 bg-blue-950/30 text-blue-200",
+    "purple-team": "border-violet-400/40 bg-violet-950/30 text-violet-200",
   };
 
   const handlePathChange = (slug: string) => {
@@ -382,9 +382,9 @@ export default function PathsPage() {
   };
 
   return (
-    <main className="flex h-screen overflow-hidden bg-[#f7f7f5] text-zinc-900">
+    <main className="flex h-screen overflow-hidden bg-[#17191d] text-white">
       <div className="flex h-full w-full flex-row">
-        <aside className="border-r border-zinc-200 bg-[#f5f5f4] p-3 lg:w-[18%] lg:p-4">
+        <aside className="border-r border-white/10 bg-[#080b12] p-3 lg:w-[18%] lg:p-4">
           <div className="mb-4 lg:mb-6">
             <p className="font-mono text-[10px] tracking-[0.2em] text-route">PATHS</p>
           </div>
@@ -404,18 +404,21 @@ export default function PathsPage() {
                   }}
                   disabled={!isActive}
                   className={[
-                    "w-full shrink-0 rounded-lg px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-white/5",
-                    isCurrent ? "border-l-2 border-amber bg-gray-100 text-gray-900 dark:bg-white/5 dark:text-white" : "text-gray-600 dark:text-ink-soft",
+                    "w-full shrink-0 rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/5",
+                    isCurrent ? "border-l-2 border-blue-400 bg-white/10 text-white" : "text-ink-soft",
                     !isActive && "cursor-not-allowed opacity-60",
                   ].join(" ")}
                 >
-                  <div className="flex flex-col gap-1">
-                    <span className={isCurrent ? "font-body text-sm font-medium text-gray-900 dark:text-white" : "font-body text-sm text-gray-600 dark:text-ink-soft"}>
+                  <div className="flex items-start gap-2">
+                    {isCurrent && <span aria-hidden="true" className="mt-0.5 text-sm text-blue-300">📂</span>}
+                    <div className="flex flex-col gap-1">
+                    <span className={isCurrent ? "font-body text-sm font-medium text-white" : "font-body text-sm text-ink-soft"}>
                       {path.title}
                     </span>
-                    <span className={isActive ? "text-[10px] text-route" : "text-[10px] text-gray-500 dark:text-ink-soft"}>
+                    <span className={isActive ? "text-[10px] text-route" : "text-[10px] text-ink-soft"}>
                       {isActive ? "● Active" : "● Coming Soon"}
                     </span>
+                    </div>
                   </div>
                 </button>
               );
@@ -423,35 +426,28 @@ export default function PathsPage() {
           </div>
         </aside>
 
-        <section className="flex h-full min-h-0 flex-col overflow-hidden bg-white dark:bg-ink-deep lg:w-[52%] lg:border-r lg:border-gray-200 dark:lg:border-white/10">
-          <div className="border-b border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-white/10 dark:bg-ink-deep lg:px-6">
-            <div className="flex items-center gap-2">
-              <span aria-hidden="true" className="text-base">📂</span>
-              <p className="font-display text-base font-semibold text-gray-900 dark:text-white">{activePath.title}</p>
-            </div>
-          </div>
-
-          <div className="border-b border-zinc-200 bg-white px-4 py-4 lg:px-6">
+        <section className="flex h-full min-h-0 flex-col overflow-hidden bg-[#050505] lg:w-[52%] lg:border-r lg:border-white/10">
+          <div className="border-b border-white/10 bg-[#050505] px-4 py-4 lg:px-6">
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search paths..."
-              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 font-body text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-400"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 font-body text-sm text-white placeholder:text-ink-soft outline-none transition-colors focus:border-blue-400/60"
             />
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-4 lg:px-6 lg:py-6">
             <div className="space-y-4">
               {filteredTeams.map((team) => {
-                const isExpanded = expandedTeams[team.id] ?? true;
+                const isExpanded = expandedTeams[team.id] ?? false;
 
                 return (
                   <div key={team.id} className="relative pl-3">
-                    <div className="absolute inset-y-0 left-0 w-px bg-gray-300 dark:bg-white/15" aria-hidden="true" />
+                    <div className="absolute inset-y-0 left-0 w-px bg-white/15" aria-hidden="true" />
 
                     <div className="flex items-center gap-2 py-2 pl-2">
-                      <span className="font-mono text-[10px] text-gray-500 dark:text-ink-soft">─</span>
+                      <span className="font-mono text-[10px] text-ink-soft">─</span>
                       <button
                         type="button"
                         onMouseEnter={() => setHoveredTeamId(team.id)}
@@ -459,7 +455,7 @@ export default function PathsPage() {
                         onFocus={() => setHoveredTeamId(team.id)}
                         onBlur={() => setHoveredTeamId((current) => (current === team.id ? null : current))}
                         onClick={() => setExpandedTeams((current) => ({ ...current, [team.id]: !(current[team.id] ?? true) }))}
-                        className={["flex w-full items-center justify-between rounded-lg border px-2 py-1 text-left transition-colors hover:bg-gray-50 dark:hover:bg-white/5", teamToneClasses[team.id] ?? "border-gray-200 bg-gray-50 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-white"].join(" ")}
+                        className={["flex w-full items-center justify-between rounded-lg border px-2 py-1 text-left transition-colors hover:bg-white/10", teamToneClasses[team.id] ?? "border-white/10 bg-white/5 text-white"].join(" ")}
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-base" aria-hidden="true">{team.icon}</span>
@@ -478,7 +474,7 @@ export default function PathsPage() {
                         isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0",
                       ].join(" ")}
                     >
-                      <div className="ml-4 border-l border-gray-200 dark:border-white/10 pl-3">
+                      <div className="ml-4 border-l border-white/10 pl-3">
                         <div className="space-y-1 pb-2 pt-1">
                           {team.visibleSpecializations.map((specialization) => {
                             const isSelected = selectedSpec?.id === specialization.id;
@@ -497,21 +493,21 @@ export default function PathsPage() {
                                 className={[
                                   "flex w-full items-center justify-between gap-3 rounded-lg border-l px-3 py-2 text-left transition-all duration-200",
                                   isSelected
-                                    ? "border-l-2 border-amber bg-zinc-100 text-zinc-900"
+                                    ? "border-l-2 border-blue-400 bg-white/10 text-white"
                                     : isHovered
-                                      ? "bg-zinc-100 text-zinc-900"
-                                      : "border-l border-transparent bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+                                      ? "bg-white/10 text-white"
+                                      : "border-l border-transparent bg-transparent text-ink-soft hover:bg-white/5 hover:text-white",
                                 ].join(" ")}
                               >
                                 <div className="flex min-w-0 items-center gap-2">
-                                  <span className="font-mono text-[10px] text-gray-500 dark:text-ink-soft">├─</span>
+                                  <span className="font-mono text-[10px] text-ink-soft">├─</span>
                                   <span className="truncate font-body text-sm">{specialization.label}</span>
                                 </div>
 
                                 <span
                                   className={[
                                     "whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium",
-                                    isActive ? "bg-route/10 text-route" : "bg-gray-200 text-gray-600 dark:bg-white/5 dark:text-ink-soft",
+                                    isActive ? "bg-route/10 text-route" : "bg-white/10 text-ink-soft",
                                   ].join(" ")}
                                 >
                                   {isActive ? "● Active" : "○ Soon"}
@@ -527,8 +523,8 @@ export default function PathsPage() {
               })}
 
               {filteredTeams.length === 0 && (
-                <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center dark:border-white/10 dark:bg-white/[0.02]">
-                  <p className="font-body text-sm text-gray-600 dark:text-ink-soft">No matching specializations found.</p>
+                <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
+                  <p className="font-body text-sm text-ink-soft">No matching specializations found.</p>
                 </div>
               )}
             </div>
@@ -537,22 +533,22 @@ export default function PathsPage() {
 
         <aside
           className={[
-            "fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200 bg-white p-4 shadow-2xl shadow-zinc-200/60 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
+            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#0e1420] p-4 shadow-2xl shadow-black/40 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
             sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)] lg:translate-y-0",
           ].join(" ")}
         >
           <div className="mb-3 flex items-center justify-between lg:hidden">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-route">Details</p>
-            <button type="button" onClick={() => setSheetOpen(false)} className="font-body text-sm text-gray-600 dark:text-ink-soft">
+            <button type="button" onClick={() => setSheetOpen(false)} className="font-body text-sm text-ink-soft">
               Close
             </button>
           </div>
 
           <div className="h-full overflow-y-auto">
             {!visibleSpec && !visibleTeam && (
-              <div className="flex min-h-[220px] flex-col justify-center gap-4 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
-                <h2 className="font-display text-lg text-zinc-900">Explore a path</h2>
-                <p className="font-body text-sm text-zinc-600">Hover to preview, click to lock the details here.</p>
+              <div className="flex min-h-[220px] flex-col justify-center gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-5">
+                <h2 className="font-display text-lg text-white">Explore a path</h2>
+                <p className="font-body text-sm text-ink-soft">Hover to preview, click to lock the details here.</p>
                 <div className="flex flex-wrap gap-2">
                   <span className="rounded-full border border-route/20 bg-route/10 px-3 py-1 text-xs text-route">Penetration Testing</span>
                 </div>
@@ -563,14 +559,14 @@ export default function PathsPage() {
               <div className="space-y-5">
                 <div className={[
                   "inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em]",
-                  teamToneClasses[visibleTeam.id] ?? "border-zinc-200 bg-zinc-100 text-zinc-700",
+                  teamToneClasses[visibleTeam.id] ?? "border-white/10 bg-white/5 text-white",
                 ].join(" ")}>
                   {visibleTeam.id.replace("-", " ").toUpperCase()}
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-zinc-900">{visibleTeam.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-zinc-600">{visibleTeam.description}</p>
+                  <h2 className="font-display text-xl font-bold text-white">{visibleTeam.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{visibleTeam.description}</p>
                 </div>
 
                 <div>
@@ -579,7 +575,7 @@ export default function PathsPage() {
                     {visibleTeam.specializations.map((specialization) => (
                       <span
                         key={specialization.id}
-                        className="rounded-full border border-zinc-200 bg-zinc-100 px-2 py-1 font-body text-[11px] text-zinc-700"
+                        className="rounded-full border border-white/10 bg-white/5 px-2 py-1 font-body text-[11px] text-ink-soft"
                       >
                         {specialization.label}
                       </span>
@@ -595,7 +591,7 @@ export default function PathsPage() {
                   "inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em]",
                   teamToneClasses[
                     activeTree.find((team) => team.specializations.some((specialization) => specialization.id === visibleSpec.id))?.id ?? ""
-                  ] ?? "border-zinc-200 bg-zinc-100 text-zinc-700",
+                  ] ?? "border-white/10 bg-white/5 text-white",
                 ].join(" ")}>
                   {activeTree
                     .find((team) => team.specializations.some((specialization) => specialization.id === visibleSpec.id))
@@ -604,18 +600,18 @@ export default function PathsPage() {
                 </div>
 
                 <div>
-                  <h2 className="font-display text-xl font-bold text-zinc-900">{visibleSpec.label}</h2>
-                  <p className="mt-3 font-body text-sm leading-6 text-zinc-600">{visibleSpec.description}</p>
+                  <h2 className="font-display text-xl font-bold text-white">{visibleSpec.label}</h2>
+                  <p className="mt-3 font-body text-sm leading-6 text-ink-soft">{visibleSpec.description}</p>
                 </div>
 
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">WHO IT&apos;S FOR:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-zinc-600">{visibleSpec.whoFor}</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{visibleSpec.whoFor}</p>
                 </div>
 
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-route">DURATION:</p>
-                  <p className="mt-2 font-body text-sm leading-6 text-zinc-600">{visibleSpec.duration}</p>
+                  <p className="mt-2 font-body text-sm leading-6 text-ink-soft">{visibleSpec.duration}</p>
                 </div>
 
                 {visibleSpec.status === "active" ? (
@@ -626,7 +622,7 @@ export default function PathsPage() {
                     Start this path <span aria-hidden="true">→</span>
                   </Link>
                 ) : (
-                  <p className="font-body text-sm text-zinc-600">Coming soon — roadmap in progress</p>
+                  <p className="font-body text-sm text-ink-soft">Coming soon — roadmap in progress</p>
                 )}
               </div>
             )}
