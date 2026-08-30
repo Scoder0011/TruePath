@@ -533,7 +533,7 @@ export default function PathsPage() {
 
         <aside
           className={[
-            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#0e1420] p-4 shadow-2xl shadow-black/40 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
+            "fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#050505] p-4 shadow-2xl shadow-black/40 transition-transform duration-200 lg:static lg:h-full lg:w-[30%] lg:border-t-0 lg:border-l lg:p-6 lg:translate-y-0",
             sheetOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)] lg:translate-y-0",
           ].join(" ")}
         >
