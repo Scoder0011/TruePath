@@ -15,6 +15,7 @@ import { getVisitedPathways, type VisitedPathway } from "@/lib/supabase/pathActi
 type ProgressRow = { path_slug: string | null; spec_slug: string; stage_id: string; resource_id: string };
 
 export default function DashboardWorkspace({ userName, initialProgress }: { userName: string; initialProgress: ProgressRow[] }) {
+  // userName is now sourced from profile.display_name with fallback to email prefix
   const [paths, setPaths] = useState<Path[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>(initialProgress);
   const [query, setQuery] = useState("");

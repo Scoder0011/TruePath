@@ -19,7 +19,15 @@ export default async function DashboardPage() {
     .select("path_slug, spec_slug, stage_id, resource_id")
     .eq("user_id", user!.id as string);
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user!.id as string)
+    .single();
+
+  const greetingName = profile?.display_name || user?.email?.split("@")[0] || "there";
+
   return (
-    <DashboardWorkspace userName={user?.email?.split("@")[0] ?? "there"} initialProgress={(rawRows ?? []) as ProgressRow[]} />
+    <DashboardWorkspace userName={greetingName} initialProgress={(rawRows ?? []) as ProgressRow[]} />
   );
 }
