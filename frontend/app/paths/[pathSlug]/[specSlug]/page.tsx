@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ROADMAPS, type RoadmapStage, type RoadmapResource } from "@/lib/constants/roadmaps";
+import { type Roadmap, type RoadmapStage, type RoadmapResource } from "@/lib/constants/roadmaps";
 import { getProgressForSpec, setResourceComplete } from "@/lib/supabase/progress";
 import { getLearningMode, setLearningMode, type LearningMode } from "@/lib/supabase/learningMode";
 import { createClient } from "@/lib/supabase/client";
 import ModeSelectModal from "@/components/paths/ModeSelectModal";
 import ConfirmModal from "@/components/paths/ConfirmModal";
 import { markPathwayVisited } from "@/lib/supabase/pathActivity";
+import { getPath } from "@/lib/api/client";
 
 const LEVELS = ["fundamentals", "intermediate", "expert"] as const;
 type Level = (typeof LEVELS)[number];
@@ -33,8 +34,9 @@ function getStageLevel(index: number, total: number): Level {
 export default function RoadmapPage() {
   const params = useParams<{ pathSlug: string; specSlug: string }>();
   const router = useRouter();
-  const roadmap = ROADMAPS[params.specSlug];
 
+  const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
+  const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<LearningMode | null>(null);
@@ -50,14 +52,35 @@ export default function RoadmapPage() {
     supabase.auth.getUser().then(({ data }) => setLoggedIn(!!data.user));
     markPathwayVisited(params.pathSlug, params.specSlug);
 
-    if (!roadmap) return;
+    getPath(params.pathSlug)
+      .then((pathData) => {
+        const spec = pathData.specializations.find((s: any) => s.slug === params.specSlug);
+        if (spec && spec.stages && spec.stages.length > 0) {
+          const fetchedRoadmap: Roadmap = {
+            title: spec.title,
+            pathSlug: params.pathSlug,
+            stages: spec.stages.map((stage: any) => ({
+              id: stage.slug,
+              title: stage.title,
+              resources: stage.topics.flatMap((t: any) => t.resources).map((r: any) => ({
+                id: r.id,
+                name: r.title,
+                url: r.url
+              }))
+            }))
+          };
+          setRoadmap(fetchedRoadmap);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
 
     getProgressForSpec(params.specSlug).then(setCompleted);
     getLearningMode(params.specSlug).then((m) => {
       setMode(m);
       setModeLoaded(true);
     });
-  }, [params.specSlug, roadmap]);
+  }, [params.pathSlug, params.specSlug]);
 
   async function handleModeSelect(newMode: LearningMode) {
     setMode(newMode); // optimistic, so the modal closes immediately
@@ -109,15 +132,24 @@ export default function RoadmapPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-ink-deep px-6 text-center">
+        <p className="font-mono text-xs tracking-[0.15em] text-gray-500 dark:text-ink-soft">ROADMAP</p>
+        <h1 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">Loading...</h1>
+      </main>
+    );
+  }
+
   if (!roadmap) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-black px-6 text-center">
-        <p className="font-mono text-xs tracking-[0.15em] text-zinc-400">ROADMAP</p>
-        <h1 className="mt-3 font-display text-2xl font-bold text-white">Coming soon</h1>
-        <p className="mt-2 max-w-sm font-body text-sm text-zinc-400">
+      <main className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-ink-deep px-6 text-center">
+        <p className="font-mono text-xs tracking-[0.15em] text-gray-500 dark:text-ink-soft">ROADMAP</p>
+        <h1 className="mt-3 font-display text-2xl font-bold text-gray-900 dark:text-white">Coming soon</h1>
+        <p className="mt-2 max-w-sm font-body text-sm text-gray-500 dark:text-ink-soft">
           This specialization&apos;s staged roadmap isn&apos;t built out yet.
         </p>
-        <Link href="/paths" className="mt-6 font-body text-sm text-blue-300 hover:text-white">
+        <Link href="/paths" className="mt-6 font-body text-sm text-amber hover:text-gray-900 dark:hover:text-white">
           ← Back to paths
         </Link>
       </main>
@@ -149,24 +181,24 @@ export default function RoadmapPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-12 text-white">
+    <main className="min-h-screen bg-white dark:bg-ink-deep px-6 py-12 text-gray-900 dark:text-white">
       <div className="mx-auto max-w-2xl">
         <button
           type="button"
           onClick={() => router.back()}
-          className="font-body text-sm text-blue-300 hover:text-white"
+          className="font-body text-sm text-amber hover:text-gray-900 dark:hover:text-white"
         >
           ← Back to previous page
         </button>
 
-        <p className="mt-4 font-mono text-xs tracking-[0.15em] text-zinc-400">{roadmap.pathSlug.toUpperCase()}</p>
+        <p className="mt-4 font-mono text-xs tracking-[0.15em] text-gray-500 dark:text-ink-soft">{roadmap.pathSlug.toUpperCase()}</p>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-3xl font-bold text-white">{roadmap.title}</h1>
+          <h1 className="font-display text-3xl font-bold text-gray-900 dark:text-white">{roadmap.title}</h1>
           {loggedIn && mode && (
             <button
               type="button"
               onClick={() => setMode(null)}
-              className="rounded-full border border-zinc-700 px-3 py-1 font-mono text-[10px] tracking-[0.1em] text-zinc-400 hover:border-blue-400 hover:text-blue-300"
+              className="rounded-full border border-gray-200 dark:border-white/10 px-3 py-1 font-mono text-[10px] tracking-[0.1em] text-gray-500 dark:text-ink-soft hover:border-amber hover:text-amber"
             >
               MODE: {mode === "staged" ? "STAGED" : "SELF-PACED"} · CHANGE
             </button>
@@ -174,7 +206,7 @@ export default function RoadmapPage() {
         </div>
 
         {loggedIn === false && (
-          <p className="mt-4 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 font-body text-sm text-zinc-300">
+          <p className="mt-4 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3 font-body text-sm text-gray-600 dark:text-ink-soft">
             <Link href={`/login?next=/paths/${params.pathSlug}/${params.specSlug}`} className="underline">
               Log in
             </Link>{" "}
@@ -183,18 +215,18 @@ export default function RoadmapPage() {
         )}
 
         <div className="mt-6">
-          <div className="flex items-center justify-between font-body text-xs text-zinc-400">
+          <div className="flex items-center justify-between font-body text-xs text-gray-500 dark:text-ink-soft">
             <span>
               {doneStages} of {totalStages} stages complete
             </span>
             <span>{pct}%</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
             <div className="h-full rounded-full bg-route transition-all" style={{ width: `${pct}%` }} />
           </div>
         </div>
 
-        <div className="mt-8 flex gap-2 overflow-x-auto border-b border-zinc-800" role="tablist" aria-label="Roadmap levels">
+        <div className="mt-8 flex gap-2 overflow-x-auto border-b border-gray-200 dark:border-white/10" role="tablist" aria-label="Roadmap levels">
           {LEVELS.map((level) => {
             const levelStages = stagesByLevel[level];
             const levelComplete = levelStages.length > 0 && levelStages.every(({ stage }) => isStageComplete(stage, completed));
@@ -206,18 +238,18 @@ export default function RoadmapPage() {
                 role="tab"
                 aria-selected={selectedLevel === level}
                 onClick={() => setSelectedLevel(level)}
-                className={`relative shrink-0 px-3 pb-3 font-body text-sm transition-colors ${selectedLevel === level ? "font-medium text-white" : "text-white/70 hover:text-white"}`}
+                className={`relative shrink-0 px-3 pb-3 font-body text-sm transition-colors ${selectedLevel === level ? "font-medium text-gray-900 dark:text-white" : "text-gray-900/70 dark:text-white/70 hover:text-gray-900 dark:hover:text-white"}`}
               >
                 {LEVEL_LABELS[level]}
-                {levelComplete && <span className="ml-2 text-blue-300" aria-label="complete">✓</span>}
-                {selectedLevel === level && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-blue-400" />}
+                {levelComplete && <span className="ml-2 text-amber" aria-label="complete">✓</span>}
+                {selectedLevel === level && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-amber" />}
               </button>
             );
           })}
         </div>
 
         {effectiveMode === "staged" && firstIncompleteStage && (
-          <p className="mt-4 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 font-body text-sm text-zinc-300">
+          <p className="mt-4 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3 font-body text-sm text-gray-600 dark:text-ink-soft">
             Staged mode is showing your current {LEVEL_LABELS[selectedLevel].toLowerCase()} stage. Complete it to continue.
           </p>
         )}
@@ -232,34 +264,34 @@ export default function RoadmapPage() {
                 key={stage.id}
                 className={`rounded-xl border p-5 transition-opacity ${
                   locked
-                    ? "border-zinc-300 bg-zinc-100 opacity-60"
-                    : "border-zinc-300 bg-white"
+                    ? "border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 opacity-60"
+                    : "border-gray-200 dark:border-white/10 bg-white dark:bg-ink-deep"
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <span
                     className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-[10px] ${
                       stageComplete
-                        ? "border-blue-500 bg-blue-600 text-white"
-                        : "border-zinc-300"
+                        ? "border-amber bg-amber text-gray-900 dark:text-white"
+                        : "border-gray-200 dark:border-white/10"
                     }`}
                   >
                     {stageComplete ? "✓" : locked ? "🔒" : ""}
                   </span>
                   <div className="flex-1">
-                    <p className="font-mono text-[10px] text-zinc-500">{LEVEL_LABELS[selectedLevel].toUpperCase()} · STAGE {index + 1}</p>
+                    <p className="font-mono text-[10px] text-gray-500 dark:text-ink-soft">{LEVEL_LABELS[selectedLevel].toUpperCase()} · STAGE {index + 1}</p>
                     <h3
                       className={`mt-0.5 font-display text-base font-medium ${
                         stageComplete
-                          ? "text-blue-600 line-through"
-                          : "text-zinc-900"
+                          ? "text-amber line-through"
+                          : "text-gray-900 dark:text-white"
                       }`}
                     >
                       {stage.title}
                     </h3>
 
                     {locked ? (
-                      <p className="mt-2 font-body text-xs text-zinc-600">
+                      <p className="mt-2 font-body text-xs text-gray-600 dark:text-ink-soft">
                         Complete the previous stage to unlock this one.
                       </p>
                     ) : (
@@ -275,7 +307,7 @@ export default function RoadmapPage() {
                                 target="_blank"
                                 rel="noreferrer"
                                 className={`font-body text-sm hover:opacity-80 ${
-                                  isDone ? "text-blue-600 line-through" : "text-blue-600 hover:text-blue-800"
+                                  isDone ? "text-amber line-through" : "text-amber"
                                 }`}
                               >
                                 {resource.name} ↗
@@ -290,8 +322,8 @@ export default function RoadmapPage() {
                                   }
                                   className={`shrink-0 rounded-full px-2.5 py-1 font-mono text-[10px] tracking-[0.05em] transition-colors ${
                                     isDone
-                                      ? "bg-blue-700 text-white hover:bg-blue-600"
-                                      : "bg-blue-700 text-white hover:bg-blue-600"
+                                      ? "bg-amber text-gray-900 dark:text-white hover:opacity-80"
+                                      : "bg-amber text-gray-900 dark:text-white hover:opacity-80"
                                   }`}
                                 >
                                   {isDone ? "DONE ✓" : "MARK DONE"}
