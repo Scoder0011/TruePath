@@ -12,6 +12,13 @@ import { pathToTree, type Path, type TreeNode } from "@/lib/types/path-tree";
 import { CYBERSECURITY_TREE } from "@/lib/constants/cybersecurityTeams";
 import type { ProgressRow, StartedMode } from "@/app/(dashboard)/dashboard/page";
 
+type VisitedPathway = {
+  spec_slug: string;
+  mode: string;
+  pathSlug: string;
+  specSlug: string;
+};
+
 export default function DashboardWorkspace({
   userName,
   initialProgress,
