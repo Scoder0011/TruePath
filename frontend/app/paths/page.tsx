@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import ModeSelectModal from "@/components/paths/ModeSelectModal";
+import { setLearningMode, type LearningMode } from "@/lib/supabase/learningMode";
 
 type PathOption = {
   id: string;
@@ -323,6 +327,49 @@ const CYBERSECURITY_TREE: TeamNode[] = [
 ];
 
 export default function PathsPage() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [startedSpecs, setStartedSpecs] = useState<Set<string>>(new Set());
+  const [showModeModalFor, setShowModeModalFor] = useState<SpecializationItem | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setIsLoggedIn(true);
+        supabase
+          .from("user_learning_mode")
+          .select("spec_slug")
+          .eq("user_id", data.user.id)
+          .then(({ data: modes }) => {
+            if (modes) setStartedSpecs(new Set(modes.map((m) => m.spec_slug)));
+          });
+      }
+    });
+  }, []);
+
+  async function handleModeSelect(mode: LearningMode) {
+    if (!showModeModalFor) return;
+    try {
+      await setLearningMode(showModeModalFor.slug, mode);
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function handleStartClick(spec: SpecializationItem) {
+    if (startedSpecs.has(spec.slug)) {
+      router.push("/dashboard");
+      return;
+    }
+    if (!isLoggedIn) {
+      router.push(`/login?next=/paths/${activePathSlug}/${spec.slug}`);
+      return;
+    }
+    setShowModeModalFor(spec);
+  }
+
   const [activePathSlug, setActivePathSlug] = useState("cybersecurity");
   const [search, setSearch] = useState("");
   const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({
@@ -615,12 +662,13 @@ export default function PathsPage() {
                 </div>
 
                 {visibleSpec.status === "active" ? (
-                  <Link
-                    href={`/paths/${activePath.slug}/${visibleSpec.slug}`}
+                  <button
+                    type="button"
+                    onClick={() => handleStartClick(visibleSpec)}
                     className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 font-body text-sm font-medium text-white transition-opacity hover:bg-zinc-800"
                   >
-                    Start this path <span aria-hidden="true">→</span>
-                  </Link>
+                    {startedSpecs.has(visibleSpec.slug) ? "Continue" : "Start this path"} <span aria-hidden="true">→</span>
+                  </button>
                 ) : (
                   <p className="font-body text-sm text-ink-soft">Coming soon — roadmap in progress</p>
                 )}
@@ -629,6 +677,8 @@ export default function PathsPage() {
           </div>
         </aside>
       </div>
+
+      {showModeModalFor && <ModeSelectModal onSelect={handleModeSelect} />}
     </main>
   );
 }

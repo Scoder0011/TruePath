@@ -10,11 +10,17 @@ import { getAllProgress, setResourceComplete } from "@/lib/supabase/progress";
 import { setLearningMode, type LearningMode } from "@/lib/supabase/learningMode";
 import { pathToTree, type Path, type TreeNode } from "@/lib/types/path-tree";
 import { CYBERSECURITY_TREE } from "@/lib/constants/cybersecurityTeams";
-import { getVisitedPathways, type VisitedPathway } from "@/lib/supabase/pathActivity";
+import type { ProgressRow, StartedMode } from "@/app/(dashboard)/dashboard/page";
 
-type ProgressRow = { path_slug: string | null; spec_slug: string; stage_id: string; resource_id: string };
-
-export default function DashboardWorkspace({ userName, initialProgress }: { userName: string; initialProgress: ProgressRow[] }) {
+export default function DashboardWorkspace({
+  userName,
+  initialProgress,
+  startedModes,
+}: {
+  userName: string;
+  initialProgress: ProgressRow[];
+  startedModes: StartedMode[];
+}) {
   // userName is now sourced from profile.display_name with fallback to email prefix
   const [paths, setPaths] = useState<Path[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>(initialProgress);
@@ -30,15 +36,7 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
 
   useEffect(() => {
     getAllPaths().then(setPaths).catch(() => setError("Path catalog is unavailable right now.")).finally(() => setLoading(false));
-    getAllProgress().then(setProgress).catch(() => undefined);
-    setVisitedPathways(getVisitedPathways());
-    const refreshVisited = () => setVisitedPathways(getVisitedPathways());
-    window.addEventListener("truepath-pathway-visited", refreshVisited);
-    window.addEventListener("storage", refreshVisited);
-    return () => {
-      window.removeEventListener("truepath-pathway-visited", refreshVisited);
-      window.removeEventListener("storage", refreshVisited);
-    };
+    getAllProgress().then((prog) => setProgress(prog as ProgressRow[])).catch(() => undefined);
   }, []);
 
   const domains = useMemo(() => {
@@ -48,14 +46,61 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
   }, [paths, query]);
 
   const visiblePaths = paths.filter((path) => `${path.title} ${path.description ?? ""}`.toLowerCase().includes(query.toLowerCase()));
+  
   const inProgress = paths.flatMap((path) => {
-    const specSlugs = new Set([
-      ...progress.filter((row) => row.path_slug === path.slug).map((row) => row.spec_slug),
-      ...visitedPathways.filter((item) => item.pathSlug === path.slug).map((item) => item.specSlug),
-    ]);
-    return [...specSlugs].map((specSlug) => ({ path, spec: path.specializations?.find((item) => item.slug === specSlug) })).filter((item): item is { path: Path; spec: NonNullable<Path["specializations"]>[number] } => Boolean(item.spec));
+    const specSlugs = startedModes.map((m) => m.spec_slug);
+    return specSlugs
+      .map((specSlug) => ({
+        path,
+        spec: path.specializations?.find((item) => item.slug === specSlug),
+        mode: startedModes.find((m) => m.spec_slug === specSlug)?.mode,
+      }))
+      .filter(
+        (item): item is { path: Path; spec: NonNullable<Path["specializations"]>[number]; mode: LearningMode } =>
+          Boolean(item.spec)
+      );
   });
+  
   const completedIds = useMemo(() => new Set(progress.filter((row) => !selectedPath || row.path_slug === selectedPath.slug).map((row) => row.resource_id)), [progress, selectedPath]);
+
+  const streakCount = useMemo(() => {
+    if (!progress.length) return 0;
+    
+    // Extract dates (YYYY-MM-DD)
+    const completedDates = new Set<string>();
+    progress.forEach((p) => {
+      if (p.completed_at) {
+        completedDates.add(new Date(p.completed_at).toISOString().split("T")[0]);
+      }
+    });
+
+    const dates = Array.from(completedDates).sort().reverse();
+    if (dates.length === 0) return 0;
+
+    const todayStr = new Date().toISOString().split("T")[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+    // If no activity today or yesterday, streak is 0
+    if (dates[0] !== todayStr && dates[0] !== yesterdayStr) return 0;
+
+    let streak = 1;
+    let currentDate = new Date(dates[0]);
+
+    for (let i = 1; i < dates.length; i++) {
+      const prevDateStr = dates[i];
+      currentDate.setDate(currentDate.getDate() - 1);
+      const expectedDateStr = currentDate.toISOString().split("T")[0];
+
+      if (prevDateStr === expectedDateStr) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }, [progress]);
 
   function requestDomain(slug: string) {
     setPendingDomain(slug);
@@ -107,7 +152,14 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
       <div className="relative z-10 mx-auto max-w-7xl">
         <header className="flex flex-col gap-5 border-b border-white/15 pb-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="font-mono text-sm tracking-[0.18em] text-emerald-200">YOUR LEARNING CONSOLE</p>
+            <div className="flex items-center gap-4">
+              <p className="font-mono text-sm tracking-[0.18em] text-emerald-200">YOUR LEARNING CONSOLE</p>
+              {streakCount > 0 && (
+                <span className="flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 font-mono text-xs text-orange-400">
+                  <span aria-hidden="true">🔥</span> {streakCount} day streak
+                </span>
+              )}
+            </div>
             <h1 className="mt-2 font-display text-3xl font-bold text-white">Welcome back, {userName}</h1>
             <p className="mt-2 max-w-xl font-body text-sm text-slate-300">Choose a domain and keep building your next capability.</p>
           </div>
@@ -121,7 +173,7 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
 
         <section className="mt-8">
           <div className="flex items-center justify-between gap-4"><h2 className="font-display text-xl font-semibold text-white">In progress</h2><Link href="/paths" className="font-body text-sm text-blue-300 hover:text-white hover:underline">Browse all paths</Link></div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{loading && <div className="rounded-xl border border-slate-600 bg-[#0b0b0b] px-5 py-6 font-body text-sm text-slate-300 md:col-span-2 lg:col-span-3" role="status">Loading your paths...</div>}{inProgress.map(({ path, spec }) => <ProgressCard key={`${path.slug}-${spec.slug}`} path={path} spec={spec} progress={progress} />)}{!loading && !inProgress.length && <div className="rounded-xl border border-dashed border-slate-600 bg-[#0b0b0b] px-5 py-6 md:col-span-2 lg:col-span-3"><p className="font-display text-base font-semibold text-white">No path currently underway</p><p className="mt-2 font-body text-sm text-slate-300">Start any roadmap or pathway and your progress will appear here.</p><Link href="/paths" className="mt-4 inline-block font-body text-sm font-medium text-blue-300 hover:text-white hover:underline">Browse pathways <span aria-hidden="true">→</span></Link></div>}</div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{loading && <div className="rounded-xl border border-slate-600 bg-[#0b0b0b] px-5 py-6 font-body text-sm text-slate-300 md:col-span-2 lg:col-span-3" role="status">Loading your paths...</div>}{inProgress.map(({ path, spec, mode }) => <ProgressCard key={`${path.slug}-${spec.slug}`} path={path} spec={spec} progress={progress} mode={mode} />)}{!loading && !inProgress.length && <div className="rounded-xl border border-dashed border-slate-600 bg-[#0b0b0b] px-5 py-6 md:col-span-2 lg:col-span-3"><p className="font-display text-base font-semibold text-white">You haven't started a path yet.</p><p className="mt-2 font-body text-sm text-slate-300">Start any roadmap or pathway and your progress will appear here.</p><Link href="/paths" className="mt-4 inline-block font-body text-sm font-medium text-blue-300 hover:text-white hover:underline">Browse paths <span aria-hidden="true">→</span></Link></div>}</div>
         </section>
 
         <section className="mt-10">
@@ -176,7 +228,7 @@ export default function DashboardWorkspace({ userName, initialProgress }: { user
   );
 }
 
-function ProgressCard({ path, spec, progress }: { path: Path; spec: NonNullable<Path["specializations"]>[number]; progress: ProgressRow[] }) {
+function ProgressCard({ path, spec, progress, mode }: { path: Path; spec: NonNullable<Path["specializations"]>[number]; progress: ProgressRow[], mode: LearningMode }) {
   const completed = progress.filter((row) => row.path_slug === path.slug && row.spec_slug === spec.slug).length;
   const total = (spec.stages ?? []).reduce((sum, stage) => sum + (stage.topics ?? []).reduce((topicSum, topic) => topicSum + (topic.resources ?? []).length, 0), 0);
   const percent = total ? Math.min(100, Math.round((completed / total) * 100)) : 0;
@@ -184,7 +236,7 @@ function ProgressCard({ path, spec, progress }: { path: Path; spec: NonNullable<
   const isRedTeam = team?.id === "red-team";
   const interactiveClass = isRedTeam ? "text-red-300 hover:text-white" : "text-blue-300 hover:text-white";
   const borderClass = team?.id === "red-team" ? "border-red-400/50" : team?.id === "blue-team" ? "border-blue-400/50" : team?.id === "purple-team" ? "border-purple-400/50" : "border-slate-600";
-  return <article className={`rounded-2xl border bg-[#0b0b0b] p-5 shadow-sm ${borderClass}`}><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] tracking-[0.15em] text-slate-400">PATHWAY</p><p className="mt-1 font-body text-xs text-slate-400">{path.title} <span aria-hidden="true">›</span> {team?.label ?? "Team"} <span aria-hidden="true">›</span></p><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-1 block font-display text-lg font-semibold ${interactiveClass}`}>{spec.title}</Link></div><span className="rounded-full border border-route/50 px-2 py-1 font-mono text-[10px] text-route">{percent === 100 ? "BADGE EARNED" : `${percent}%`}</span></div><p className="mt-2 line-clamp-2 font-body text-sm text-slate-300">{spec.description ?? "Continue building this capability."}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-800"><div className="h-full bg-route transition-all" style={{ width: `${percent}%` }} /></div><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-4 inline-block font-body text-sm font-medium ${interactiveClass}`}>{completed ? "Continue path" : "Open pathway"} <span aria-hidden="true">→</span></Link></article>;
+  return <article className={`rounded-2xl border bg-[#0b0b0b] p-5 shadow-sm ${borderClass}`}><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] tracking-[0.15em] text-slate-400">PATHWAY</p><p className="mt-1 font-body text-xs text-slate-400">{path.title} <span aria-hidden="true">›</span> {team?.label ?? "Team"} <span aria-hidden="true">›</span></p><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-1 block font-display text-lg font-semibold ${interactiveClass}`}>{spec.title}</Link></div><div className="flex flex-col items-end gap-1"><span className="rounded-full border border-route/50 px-2 py-1 font-mono text-[10px] text-route">{percent === 100 ? "BADGE EARNED" : `${percent}%`}</span><span className="font-mono text-[10px] tracking-[0.1em] text-slate-400 uppercase">{mode.replace("_", "-")}</span></div></div><p className="mt-2 line-clamp-2 font-body text-sm text-slate-300">{spec.description ?? "Continue building this capability."}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-zinc-800"><div className="h-full bg-route transition-all" style={{ width: `${percent}%` }} /></div><Link href={`/paths/${path.slug}/${spec.slug}`} className={`mt-4 inline-block font-body text-sm font-medium ${interactiveClass}`}>Continue <span aria-hidden="true">→</span></Link></article>;
 }
 
 function getLockedStageIds(path: Path, progress: ProgressRow[]) {
