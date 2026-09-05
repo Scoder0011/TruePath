@@ -35,6 +35,7 @@ export default function DashboardWorkspace({ userName, initialProgress, startedM
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lockedStage, setLockedStage] = useState<string | null>(null);
+  const [showResourceInfo, setShowResourceInfo] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,6 +130,7 @@ export default function DashboardWorkspace({ userName, initialProgress, startedM
         <section className="mt-8">
           {loading && <p className="rounded-xl border border-gray-200 bg-white/5 px-5 py-6 font-body text-sm text-gray-500 dark:border-white/10 dark:text-ink-soft">Loading your paths...</p>}
           {!loading && !enrolled.length && <div className="rounded-xl border border-dashed border-gray-200 bg-white/5 px-5 py-8 dark:border-white/10"><h2 className="font-display text-lg font-semibold">You haven&apos;t added any paths yet.</h2><Link href="/paths" className="mt-4 inline-block font-body text-sm text-amber hover:text-gray-900 dark:hover:text-white">Browse paths →</Link></div>}
+          {showResourceInfo && <div className="relative mb-6 rounded-xl border border-amber/20 bg-amber/10 px-5 py-4"><button type="button" onClick={() => setShowResourceInfo(false)} aria-label="Dismiss resource information" className="absolute right-4 top-4 text-gray-400 hover:text-gray-700 dark:text-ink-soft dark:hover:text-white">✕</button><p className="pr-8 font-mono text-xs uppercase tracking-widest text-amber">About the resources</p><p className="mt-2 pr-8 font-body text-sm text-gray-600 dark:text-ink-soft">Some topics include 2–3 resources covering the same concept — one might be a video, another a reading or a practice lab. You don&apos;t need to complete all of them. Pick whichever format works best for you, go through it, then mark all resources in that topic as done.</p></div>}
           <div className="grid gap-6 lg:grid-cols-2">
             {enrolled.map(({ path, specialization, mode }) => <PathwayCard key={`${path.slug}-${specialization.slug}`} path={path} specialization={specialization} mode={mode} progress={progress} onModeSwitch={handleModeSwitch} onRemove={handleRemove} onLocked={setLockedStage} onResourceToggle={handleResourceToggle} />)}
           </div>
