@@ -74,6 +74,15 @@ export default function NavbarClient() {
             Paths
           </Link>
 
+          {user && (
+            <Link
+              href="/dashboard"
+              className="rounded-full px-3 py-1.5 font-body text-sm text-route bg-route/5 hover:bg-route/10 transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+
           <a
             href="https://discord.gg/pVkpAZSN"
             target="_blank"
